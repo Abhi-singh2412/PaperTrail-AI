@@ -1,0 +1,36 @@
+# ── Python bytecode & cache ────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# ── Virtual environments ───────────────────────────────────────
+venv/
+.venv/
+env/
+ENV/
+
+# ── Generated forensic reports (JSON output files) ─────────────
+reports/*.json
+!reports/.gitkeep
+
+# ── Test documents (may contain sensitive/sample PII) ──────────
+tests/sample_docs/*.pdf
+tests/sample_docs/*.docx
+tests/sample_docs/*.jpg
+tests/sample_docs/*.png
+
+# ── IDE / Editor settings ──────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── OS files ───────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Environment variables ──────────────────────────────────────
+.env
+.env.local
