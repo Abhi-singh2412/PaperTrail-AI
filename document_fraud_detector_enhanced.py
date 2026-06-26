@@ -206,12 +206,16 @@ def check_inconsistencies(values):
         tds_percentage = (values["annual_tds"] / values["annual_ctc"]) * 100
         if tds_percentage < 5 or tds_percentage > 30:
             flags.append({
-    "type":"annual_tds_mismatch",
-    "severity":"HIGH",
-    "confidence":0.95,
-    "highlight_text":annual.group(1),
-    "description":f"Expected {expected}, found {a}"
-})
+                "type": "annual_tds_mismatch",
+                "severity": "HIGH",
+                "confidence": 0.95,
+                "highlight_text": str(int(values["annual_tds"])),
+                "description": (
+                    f"TDS is {tds_percentage:.1f}% of Annual CTC — "
+                    f"expected 5–30%. TDS: ₹{values['annual_tds']:,.0f}, "
+                    f"CTC: ₹{values['annual_ctc']:,.0f}"
+                )
+            })
     
     # Check 2: Net Salary vs Gross Salary
     if values.get("gross_salary") and values.get("net_salary"):
@@ -450,23 +454,40 @@ def detect_multiple_pans(text):
 
 
 def detect_ocr_errors(text):
-
+    """
+    Detect genuine OCR corruption: digit-letter garbling inside what should
+    be a pure number field (e.g. '1O0,OOO' where O replaces 0).
+    The old broad pattern [0-9]+[A-Za-z]+[0-9,]* matched normal tokens
+    like '4th', 'Q3', 'Form16', 'PAN', 'TDS' — generating 20+ false flags.
+    This version only fires on plausible number-corruption patterns.
+    """
     flags = []
 
-    suspicious = re.findall(
-        r'[0-9]+[A-Za-z]+[0-9,]*',
-        text
+    # Pattern: a long digit-run that contains common OCR swap chars (O/l/I/S)
+    # mixed in — e.g. '1O,OOO' or '5l000'. Must be ≥5 chars and look numeric.
+    ocr_swap_pattern = re.compile(
+        r'\b\d[\dOolISZB]{4,}\b'   # starts with a real digit, then mix of digits + common OCR swaps
     )
 
-    for item in suspicious:
+    # Whitelist tokens that are legitimately alphanumeric (units, codes, IDs)
+    whitelist = re.compile(
+        r'^(q[1-4]|fy\d|[a-z]{1,4}\d{1,4}|\d{1,4}[a-z]{1,4})$',
+        re.IGNORECASE
+    )
 
-        flags.append({
-    "type":"ocr_corruption",
-    "severity":"MEDIUM",
-    "confidence":0.75,
-    "highlight_text":item,
-    "description":"Possible OCR corruption"
-})
+    for match in ocr_swap_pattern.finditer(text):
+        token = match.group(0)
+        if whitelist.match(token):
+            continue
+        # Only flag if at least one obvious OCR-swap char is present
+        if re.search(r'[OolISZB]', token):
+            flags.append({
+                "type": "ocr_corruption",
+                "severity": "MEDIUM",
+                "confidence": 0.75,
+                "highlight_text": token,
+                "description": f"Possible OCR corruption — suspicious character mix in numeric field: '{token}'"
+            })
 
     return flags
 
@@ -504,12 +525,11 @@ def detect_multiple_ifsc(text):
     if len(unique) > 1:
 
         return [{
-        "type":"multiple_pan_numbers",
-        "severity":"HIGH",
-        "confidence":0.95,
-            "highlight_text":list(unique)[0],
-            "description":
-            f"{len(unique)} IFSC codes found"
+            "type": "multiple_ifsc_codes",
+            "severity": "HIGH",
+            "confidence": 0.95,
+            "highlight_text": list(unique)[0],
+            "description": f"{len(unique)} different IFSC codes found in document — suspicious"
         }]
 
     return []
@@ -635,11 +655,66 @@ def check_ifsc_consistency(text):
 def verify_company(text, nlp):
     """Verify company against whitelist"""
     company_whitelist = {
+        # Banks
+        "Canara Bank": "L85110KA1969GOI001856",
         "Canara Bank Ltd": "L85110KA1969GOI001856",
         "State Bank of India": "L64190MH1955GOI008712",
+        "SBI": "L64190MH1955GOI008712",
+        "HDFC Bank": "L65920MH1994PLC080618",
+        "HDFC Bank Ltd": "L65920MH1994PLC080618",
+        "ICICI Bank": "L65190GJ1994PLC021012",
+        "ICICI Bank Ltd": "L65190GJ1994PLC021012",
+        "Axis Bank": "L65110GJ2007PLC079808",
+        "Punjab National Bank": "L65190PB1894GOI000030",
+        "PNB": "L65190PB1894GOI000030",
+        "Bank of Baroda": "L75190GJ1952GOI000001",
+        "Union Bank of India": "L65190MH1919GOI000105",
+        "Kotak Mahindra Bank": "L65110MH1985PLC038137",
+        "Yes Bank": "L65190MH2003PLC143249",
+        "IDBI Bank": "L65190MH2004GOI148838",
+        "Indian Bank": "L65191TN1906GOI000208",
+        "Central Bank of India": "L65190MH1911GOI000115",
+        "Bank of India": "L65220MH1906GOI000029",
+        # IT / Tech
+        "Infosys": "L85110KA1981PLC013115",
         "Infosys Ltd": "L85110KA1981PLC013115",
         "Tata Consultancy Services": "L22210MH1995PLC084781",
+        "TCS": "L22210MH1995PLC084781",
+        "Wipro": "L32102KA1945PLC020800",
         "Wipro Ltd": "L32102KA1945PLC020800",
+        "HCL Technologies": "L72200UP1999PLC023008",
+        "HCL": "L72200UP1999PLC023008",
+        "Tech Mahindra": "L32200MH1986PLC041957",
+        "Cognizant": "L72100MH1994PLC086387",
+        "Accenture": "L85110KA1989PLC020234",
+        "Accenture India": "L85110KA1989PLC020234",
+        "IBM India": "U72200KA1999PTC025078",
+        "Oracle India": "U74900MH1987PTC044032",
+        "Microsoft India": "U72900TN1994PTC028730",
+        "Amazon India": "U51109UP2013FTC056994",
+        "Flipkart": "U51109TG2012FTC081857",
+        # Manufacturing / Conglomerates
+        "Reliance Industries": "L17110MH1973PLC019786",
+        "Reliance Industries Ltd": "L17110MH1973PLC019786",
+        "Tata Motors": "L28920MH1945PLC004520",
+        "Tata Steel": "L27100MH1907PLC000260",
+        "Bajaj Auto": "L74899MH1926PLC000050",
+        "Mahindra": "L65990MH1945PLC004558",
+        "Larsen & Toubro": "L99999MH1946PLC004768",
+        "L&T": "L99999MH1946PLC004768",
+        # Finance / Insurance
+        "HDFC": "L65191MH1977PLC019916",
+        "ICICI Lombard": "L67200MH2000PLC129408",
+        "LIC": "U66010MH1956GOI009113",
+        "Life Insurance Corporation": "U66010MH1956GOI009113",
+        "Bajaj Finserv": "L65923PN2007PLC130075",
+        # Pharma
+        "Dr. Reddy's Laboratories": "L73100AP1984PLC037913",
+        "Cipla": "L65110MH1935PLC002380",
+        "Cipla Limited": "L65110MH1935PLC002380",
+        "Lupin": "L24239MH1968PLC013803",
+        "Sun Pharma": "L24230GJ1993PLC019050",
+
         "HDFC Bank Ltd": "L65920MH1994PLC080618",
         "ICICI Bank Ltd": "L65190GJ1994PLC021012",
         "Reliance Industries Ltd": "L17110MH1973PLC019786"
@@ -918,6 +993,90 @@ def annotate_pdf_with_flags(pdf_path, output_path, flags):
     return output_path
 
 # ============================================================================
+# 7b. FONT INCONSISTENCY DETECTION
+# ============================================================================
+
+def detect_font_inconsistencies(pdf_path):
+    """
+    Detect font anomalies using PyMuPDF's per-span font data.
+    A genuine payslip / Form-16 is typeset by one program — you'll see 1-2
+    fonts max.  Copy-paste forgery typically shows 3+ fonts, and sometimes
+    a field label in font A with a value in font B on the exact same line
+    (classic sign of pasted-in numbers).
+    """
+    flags = []
+
+    try:
+        doc = fitz.open(pdf_path)
+
+        for page_num, page in enumerate(doc):
+            blocks = page.get_text("dict").get("blocks", [])
+
+            for block in blocks:
+                if block.get("type") != 0:   # 0 = text block
+                    continue
+
+                for line in block.get("lines", []):
+                    spans = line.get("spans", [])
+                    if len(spans) < 2:
+                        continue
+
+                    fonts_on_line = [s.get("font", "") for s in spans if s.get("text", "").strip()]
+                    unique_fonts = set(fonts_on_line)
+
+                    if len(unique_fonts) >= 3:
+                        sample_text = " ".join(s.get("text", "") for s in spans).strip()[:80]
+                        flags.append({
+                            "type": "font_inconsistency",
+                            "severity": "HIGH",
+                            "confidence": 0.85,
+                            "highlight_text": sample_text,
+                            "description": (
+                                f"Page {page_num+1}: Line uses {len(unique_fonts)} different fonts "
+                                f"({', '.join(sorted(unique_fonts))}) — classic copy-paste forgery signal"
+                            )
+                        })
+
+        # Document-level: count total distinct fonts
+        all_fonts = set()
+        for page in doc:
+            for block in page.get_text("dict").get("blocks", []):
+                if block.get("type") != 0:
+                    continue
+                for line in block.get("lines", []):
+                    for span in line.get("spans", []):
+                        font = span.get("font", "").strip()
+                        if font:
+                            all_fonts.add(font)
+
+        if len(all_fonts) > 5:
+            flags.append({
+                "type": "excessive_font_variety",
+                "severity": "MEDIUM",
+                "confidence": 0.75,
+                "highlight_text": None,
+                "description": (
+                    f"Document uses {len(all_fonts)} distinct fonts — "
+                    f"genuine financial documents rarely use more than 3. "
+                    f"Fonts found: {', '.join(sorted(all_fonts)[:8])}"
+                )
+            })
+
+        doc.close()
+
+    except Exception as e:
+        flags.append({
+            "type": "font_analysis_error",
+            "severity": "LOW",
+            "confidence": 0.5,
+            "highlight_text": None,
+            "description": f"Font analysis could not complete: {e}"
+        })
+
+    return flags
+
+
+# ============================================================================
 # 8. COMPREHENSIVE ANALYSIS
 # ============================================================================
 
@@ -948,7 +1107,7 @@ def analyze_document(pdf_path):
     specific_values, positions = extract_specific_values(text)
     
     # Step 4: Run consistency checks
-    print("[4/8] Running financial consistency checks...")
+    print("[4/9] Running financial consistency checks...")
     financial_flags = check_inconsistencies(specific_values)
     pan_flags = validate_pan(text)
     date_flags, parsed_dates = check_date_consistency(text, nlp)
@@ -956,34 +1115,38 @@ def analyze_document(pdf_path):
     ifsc_flags = check_ifsc_consistency(text)
     
     # Step 5: Verify company
-    print("[5/8] Verifying company information...")
+    print("[5/9] Verifying company information...")
     verified, company_flags = verify_company(text, nlp)
     
     # Step 6: Combine all flags
-    print("[6/8] Calculating risk scores...")
+    print("[6/9] Calculating risk scores...")
     all_flags = (financial_flags +
     pan_flags +
     date_flags +
     profession_flags +
     ifsc_flags +
     company_flags +
-
     validate_gross_salary(text) +
     validate_annual_tds(text) +
     validate_cin(text) +
     detect_multiple_pans(text) +
     detect_ocr_errors(text) +
     detect_negative_amounts(text) +
-    detect_multiple_ifsc(text)+detect_future_dates(text)     
+    detect_multiple_ifsc(text) +
+    detect_future_dates(text) +
+    detect_font_inconsistencies(pdf_path)
 )
     risk_result = calculate_risk_score(all_flags)
     
     # Step 7: Calculate credibility
-    print("[7/8] Calculating credibility score...")
+    print("[7/9] Calculating credibility score...")
     credibility = calculate_credibility_score(specific_values, verified, pdf_metadata, doc_type)
     
-    # Step 8: Create annotated PDF
-    print("[8/8] Creating annotated PDF...")
+    # Step 8: Font inconsistencies already gathered above in all_flags
+    print("[8/9] Font analysis complete...")
+
+    # Step 9: Create annotated PDF
+    print("[9/9] Creating annotated PDF...")
     output_pdf = pdf_path.replace(".pdf", "_flagged.pdf")
     annotate_pdf_with_flags(pdf_path, output_pdf, all_flags)
     
