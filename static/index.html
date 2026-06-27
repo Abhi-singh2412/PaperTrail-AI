@@ -19,7 +19,11 @@
         --low: #3fb950;
         --radius: 8px;
       }
-      * { box-sizing: border-box; margin: 0; padding: 0; }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
       body {
         background: var(--bg);
         color: var(--text);
@@ -38,8 +42,15 @@
         gap: 16px;
         height: 56px;
       }
-      header h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
-      header span { color: var(--muted); font-size: 12px; }
+      header h1 {
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+      }
+      header span {
+        color: var(--muted);
+        font-size: 12px;
+      }
       .badge {
         background: #1f6feb33;
         color: var(--accent);
@@ -76,8 +87,14 @@
         letter-spacing: 0.8px;
         color: var(--muted);
       }
-      .panel-header.cyber { color: #58a6ff; border-left: 3px solid #58a6ff; }
-      .panel-header.nlp   { color: #3fb950; border-left: 3px solid #3fb950; }
+      .panel-header.cyber {
+        color: #58a6ff;
+        border-left: 3px solid #58a6ff;
+      }
+      .panel-header.nlp {
+        color: #3fb950;
+        border-left: 3px solid #3fb950;
+      }
 
       /* ── Drop zone ── */
       .drop-zone {
@@ -89,11 +106,25 @@
         cursor: pointer;
         transition: all 0.2s;
       }
-      .drop-zone:hover, .drop-zone.drag { border-color: var(--accent); background: #58a6ff10; }
-      .drop-zone svg { opacity: 0.4; margin-bottom: 12px; }
-      .drop-zone p { color: var(--muted); font-size: 13px; }
-      .drop-zone p strong { color: var(--text); }
-      #file-input { display: none; }
+      .drop-zone:hover,
+      .drop-zone.drag {
+        border-color: var(--accent);
+        background: #58a6ff10;
+      }
+      .drop-zone svg {
+        opacity: 0.4;
+        margin-bottom: 12px;
+      }
+      .drop-zone p {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .drop-zone p strong {
+        color: var(--text);
+      }
+      #file-input {
+        display: none;
+      }
 
       .file-info {
         margin: 0 16px 16px;
@@ -102,8 +133,16 @@
         padding: 12px;
         display: none;
       }
-      .file-info .fname { font-weight: 600; font-size: 13px; word-break: break-all; }
-      .file-info .fmeta { color: var(--muted); font-size: 11px; margin-top: 4px; }
+      .file-info .fname {
+        font-weight: 600;
+        font-size: 13px;
+        word-break: break-all;
+      }
+      .file-info .fmeta {
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 4px;
+      }
 
       /* ── Buttons ── */
       .btn {
@@ -118,13 +157,27 @@
         font-weight: 600;
         transition: opacity 0.15s;
       }
-      .btn:disabled { opacity: 0.4; cursor: default; }
-      .btn-primary { background: var(--accent); color: #0d1117; }
-      .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-      .btn:not(:disabled):hover { opacity: 0.85; }
+      .btn:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #0d1117;
+      }
+      .btn-secondary {
+        background: var(--surface2);
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+      .btn:not(:disabled):hover {
+        opacity: 0.85;
+      }
 
       /* ── Steps ── */
-      .steps { margin: 0 16px 16px; }
+      .steps {
+        margin: 0 16px 16px;
+      }
       .step {
         display: flex;
         align-items: center;
@@ -134,19 +187,40 @@
         font-size: 12px;
         color: var(--muted);
       }
-      .step:last-child { border-bottom: none; }
+      .step:last-child {
+        border-bottom: none;
+      }
       .step-dot {
-        width: 8px; height: 8px;
+        width: 8px;
+        height: 8px;
         border-radius: 50%;
         background: var(--border);
         flex-shrink: 0;
         transition: background 0.3s;
       }
-      .step.done   .step-dot { background: var(--low); }
-      .step.active .step-dot { background: var(--accent); animation: pulse 1s infinite; }
-      .step.error  .step-dot { background: var(--critical); }
-      .step.done, .step.active { color: var(--text); }
-      @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+      .step.done .step-dot {
+        background: var(--low);
+      }
+      .step.active .step-dot {
+        background: var(--accent);
+        animation: pulse 1s infinite;
+      }
+      .step.error .step-dot {
+        background: var(--critical);
+      }
+      .step.done,
+      .step.active {
+        color: var(--text);
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.4;
+        }
+      }
 
       /* ── Score cards ── */
       .scores {
@@ -161,46 +235,86 @@
         padding: 12px;
         border: 1px solid var(--border);
       }
-      .score-card .label { font-size:10px; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-bottom:6px; }
-      .score-card .value { font-size: 24px; font-weight: 700; }
-      .score-card .sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
-      .risk-CRITICAL { color: var(--critical); }
-      .risk-HIGH     { color: var(--high); }
-      .risk-MEDIUM   { color: var(--medium); }
-      .risk-LOW      { color: var(--low); }
+      .score-card .label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+      .score-card .value {
+        font-size: 24px;
+        font-weight: 700;
+      }
+      .score-card .sub {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+      .risk-CRITICAL {
+        color: var(--critical);
+      }
+      .risk-HIGH {
+        color: var(--high);
+      }
+      .risk-MEDIUM {
+        color: var(--medium);
+      }
+      .risk-LOW {
+        color: var(--low);
+      }
 
       /* ── Download row ── */
-      .dl-row { display: flex; gap: 8px; margin: 0 16px 16px; }
-      .dl-row .btn { margin: 0; flex: 1; }
+      .dl-row {
+        display: flex;
+        gap: 8px;
+        margin: 0 16px 16px;
+      }
+      .dl-row .btn {
+        margin: 0;
+        flex: 1;
+      }
 
-      /* ── Center panel ── */
-      .center-panel { position: relative; overflow: hidden; display: flex; flex-direction: column; }
-      .pdf-area     { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+      /* ── Center panel layout ── */
+      .center-panel {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
 
-      /* ── PDF retry status badge ── */
-      #pdf-retry-status {
-        display: none;
-        position: absolute;
-        bottom: 14px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: var(--surface2);
-        border: 1px solid var(--border);
-        border-radius: 20px;
-        padding: 5px 16px;
-        font-size: 12px;
-        color: var(--muted);
-        white-space: nowrap;
-        pointer-events: none;
-        z-index: 20;
+      /* ── PDF viewer ── */
+      .pdf-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
       }
 
       /* ── Flags below PDF ── */
-      .flags-below { display:none; border-top:1px solid var(--border); background:var(--bg); height:260px; flex-shrink:0; }
-      .flags-below-grid { display:grid; grid-template-columns:1fr 1fr; height:100%; overflow:hidden; }
-      .flags-below-col  { overflow-y:auto; border-right:1px solid var(--border); }
-      .flags-below-col:last-child { border-right: none; }
-      .flag-list { margin: 0 12px 12px; }
+      .flags-below {
+        display: none;
+        border-top: 1px solid var(--border);
+        background: var(--bg);
+        height: 260px;
+        flex-shrink: 0;
+      }
+      .flags-below-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        height: 100%;
+        overflow: hidden;
+      }
+      .flags-below-col {
+        overflow-y: auto;
+        border-right: 1px solid var(--border);
+      }
+      .flags-below-col:last-child {
+        border-right: none;
+      }
+      .flag-list {
+        margin: 0 12px 12px;
+      }
       .flag {
         background: var(--surface2);
         border-radius: var(--radius);
@@ -208,66 +322,180 @@
         margin-bottom: 8px;
         border-left: 3px solid var(--border);
       }
-      .flag.CRITICAL { border-left-color: var(--critical); }
-      .flag.HIGH     { border-left-color: var(--high); }
-      .flag.MEDIUM   { border-left-color: var(--medium); }
-      .flag.LOW      { border-left-color: var(--low); }
-      .flag-type { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; }
-      .flag.CRITICAL .flag-type { color: var(--critical); }
-      .flag.HIGH     .flag-type { color: var(--high); }
-      .flag.MEDIUM   .flag-type { color: var(--medium); }
-      .flag.LOW      .flag-type { color: var(--low); }
-      .flag-desc { font-size:12px; color:var(--muted); margin-top:4px; line-height:1.5; }
-      .flag-conf { font-size:10px; color:var(--border); margin-top:4px; }
+      .flag.CRITICAL {
+        border-left-color: var(--critical);
+      }
+      .flag.HIGH {
+        border-left-color: var(--high);
+      }
+      .flag.MEDIUM {
+        border-left-color: var(--medium);
+      }
+      .flag.LOW {
+        border-left-color: var(--low);
+      }
+      .flag-type {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .flag.CRITICAL .flag-type {
+        color: var(--critical);
+      }
+      .flag.HIGH .flag-type {
+        color: var(--high);
+      }
+      .flag.MEDIUM .flag-type {
+        color: var(--medium);
+      }
+      .flag.LOW .flag-type {
+        color: var(--low);
+      }
+      .flag-desc {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 4px;
+        line-height: 1.5;
+      }
+      .flag-conf {
+        font-size: 10px;
+        color: var(--border);
+        margin-top: 4px;
+      }
 
       /* ── Right panel ── */
-      .recent-scans { padding: 0; }
-      .scan-item { padding:12px 16px; border-bottom:1px solid var(--border); cursor:pointer; transition:background .15s; }
-      .scan-item:hover { background: var(--surface2); }
-      .scan-item .scan-name { font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-      .scan-item .scan-meta { font-size:11px; color:var(--muted); margin-top:3px; display:flex; gap:8px; }
-      .scan-badge { border-radius:10px; padding:1px 7px; font-size:10px; font-weight:700; }
-      .sb-CRITICAL { background:#f8514920; color:var(--critical); }
-      .sb-HIGH     { background:#ff950020; color:var(--high); }
-      .sb-MEDIUM   { background:#f0c00020; color:var(--medium); }
-      .sb-LOW      { background:#3fb95020; color:var(--low); }
+      .recent-scans {
+        padding: 0;
+      }
+      .scan-item {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .scan-item:hover {
+        background: var(--surface2);
+      }
+      .scan-item .scan-name {
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .scan-item .scan-meta {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 3px;
+        display: flex;
+        gap: 8px;
+      }
+      .scan-badge {
+        border-radius: 10px;
+        padding: 1px 7px;
+        font-size: 10px;
+        font-weight: 700;
+      }
+      .sb-CRITICAL {
+        background: #f8514920;
+        color: var(--critical);
+      }
+      .sb-HIGH {
+        background: #ff950020;
+        color: var(--high);
+      }
+      .sb-MEDIUM {
+        background: #f0c00020;
+        color: var(--medium);
+      }
+      .sb-LOW {
+        background: #3fb95020;
+        color: var(--low);
+      }
 
       /* ── Timeline ── */
-      .timeline { padding: 16px; }
-      .tl-bar-wrap { margin-bottom: 10px; }
-      .tl-label { display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-bottom:4px; }
-      .tl-bar-bg { background:var(--surface2); border-radius:4px; height:8px; overflow:hidden; }
-      .tl-bar    { height:100%; border-radius:4px; transition:width .6s ease; }
+      .timeline {
+        padding: 16px;
+      }
+      .tl-bar-wrap {
+        margin-bottom: 10px;
+      }
+      .tl-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: var(--muted);
+        margin-bottom: 4px;
+      }
+      .tl-bar-bg {
+        background: var(--surface2);
+        border-radius: 4px;
+        height: 8px;
+        overflow: hidden;
+      }
+      .tl-bar {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.6s ease;
+      }
 
       /* ── Empty ── */
-      .empty { text-align:center; padding:20px 16px; color:var(--muted); font-size:12px; }
+      .empty {
+        text-align: center;
+        padding: 20px 16px;
+        color: var(--muted);
+        font-size: 12px;
+      }
     </style>
   </head>
   <body>
     <header>
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <path d="M12 2L4 6V12C4 16.4 7.4 20.5 12 22C16.6 20.5 20 16.4 20 12V6L12 2Z" fill="#58a6ff" opacity=".9"/>
-        <path d="M9 12L11 14L15 10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path
+          d="M12 2L4 6V12C4 16.4 7.4 20.5 12 22C16.6 20.5 20 16.4 20 12V6L12 2Z"
+          fill="#58a6ff"
+          opacity=".9"
+        />
+        <path
+          d="M9 12L11 14L15 10"
+          stroke="white"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
       </svg>
       <h1>DocShield</h1>
       <span>Document Fraud Detection System</span>
-      <div style="flex:1"></div>
+      <div style="flex: 1"></div>
       <span class="badge">v2.0</span>
     </header>
 
     <div class="layout">
-
       <!-- ── LEFT: Upload + Results ── -->
       <div class="panel" id="left-panel">
         <div class="panel-header">Upload Document</div>
 
-        <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+        <div
+          class="drop-zone"
+          id="drop-zone"
+          onclick="document.getElementById('file-input').click()"
+        >
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#8b949e" stroke-width="1.5"/>
-            <path d="M14 2v6h6M12 18v-6M9 15l3-3 3 3" stroke="#8b949e" stroke-width="1.5" stroke-linecap="round"/>
+            <path
+              d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"
+              stroke="#8b949e"
+              stroke-width="1.5"
+            />
+            <path
+              d="M14 2v6h6M12 18v-6M9 15l3-3 3 3"
+              stroke="#8b949e"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            />
           </svg>
           <p><strong>Click to upload</strong> or drag & drop</p>
-          <p style="margin-top:4px;font-size:11px">PDF files only</p>
+          <p style="margin-top: 4px; font-size: 11px">PDF files only</p>
         </div>
         <input type="file" id="file-input" accept=".pdf" />
 
@@ -276,52 +504,190 @@
           <div class="fmeta" id="fmeta"></div>
         </div>
 
-        <button class="btn btn-primary" id="btn-analyze" disabled onclick="runAnalysis()">
+        <button
+          class="btn btn-primary"
+          id="btn-analyze"
+          disabled
+          onclick="runAnalysis()"
+        >
           Run Full Analysis
         </button>
 
-        <div class="steps" id="steps" style="display:none">
-          <div class="step" id="s-upload"><div class="step-dot"></div>Upload PDF</div>
-          <div class="step" id="s-cyber"><div class="step-dot"></div>Cyber / Metadata Check</div>
-          <div class="step" id="s-fraud"><div class="step-dot"></div>Content &amp; Fraud Analysis</div>
-          <div class="step" id="s-done"><div class="step-dot"></div>Report Ready</div>
+        <div class="steps" id="steps" style="display: none">
+          <div class="step" id="s-upload">
+            <div class="step-dot"></div>
+            Upload PDF
+          </div>
+          <div class="step" id="s-cyber">
+            <div class="step-dot"></div>
+            Cyber / Metadata Check
+          </div>
+          <div class="step" id="s-fraud">
+            <div class="step-dot"></div>
+            Content & Fraud Analysis
+          </div>
+          <div class="step" id="s-done">
+            <div class="step-dot"></div>
+            Report Ready
+          </div>
         </div>
 
-        <div id="result-area" style="display:none">
+        <div id="result-area" style="display: none">
           <div class="scores" id="score-cards"></div>
-          <div class="dl-row"  id="dl-row"></div>
+          <div class="dl-row" id="dl-row"></div>
         </div>
       </div>
 
       <!-- ── CENTER: PDF Viewer + Flags Below ── -->
       <div class="center-panel">
-
+        <!-- PDF area -->
         <div class="pdf-area">
           <!-- toolbar -->
-          <div id="pdf-toolbar" style="background:var(--surface);border-bottom:1px solid var(--border);padding:8px 16px;display:none;align-items:center;gap:12px;flex-shrink:0;">
-            <button onclick="pdfPrevPage()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;">‹ Prev</button>
-            <span id="pdf-page-info" style="font-size:12px;color:var(--muted)">Page 1 / 1</span>
-            <button onclick="pdfNextPage()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;">Next ›</button>
-            <button onclick="pdfZoomOut()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;">−</button>
-            <button onclick="pdfZoomIn()"  style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;">+</button>
-            <span id="pdf-zoom-info" style="font-size:12px;color:var(--muted)">150%</span>
-            <div style="flex:1"></div>
-            <button onclick="openAnnotated()" style="background:var(--accent);border:none;color:#0d1117;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-weight:600;">⬇ Download</button>
+          <div
+            id="pdf-toolbar"
+            style="
+              background: var(--surface);
+              border-bottom: 1px solid var(--border);
+              padding: 8px 16px;
+              display: none;
+              align-items: center;
+              gap: 12px;
+              flex-shrink: 0;
+            "
+          >
+            <button
+              onclick="pdfPrevPage()"
+              style="
+                background: var(--surface2);
+                border: 1px solid var(--border);
+                color: var(--text);
+                border-radius: 6px;
+                padding: 4px 10px;
+                cursor: pointer;
+                font-size: 12px;
+              "
+            >
+              ‹ Prev
+            </button>
+            <span
+              id="pdf-page-info"
+              style="font-size: 12px; color: var(--muted)"
+              >Page 1 / 1</span
+            >
+            <button
+              onclick="pdfNextPage()"
+              style="
+                background: var(--surface2);
+                border: 1px solid var(--border);
+                color: var(--text);
+                border-radius: 6px;
+                padding: 4px 10px;
+                cursor: pointer;
+                font-size: 12px;
+              "
+            >
+              Next ›
+            </button>
+            <button
+              onclick="pdfZoomOut()"
+              style="
+                background: var(--surface2);
+                border: 1px solid var(--border);
+                color: var(--text);
+                border-radius: 6px;
+                padding: 4px 10px;
+                cursor: pointer;
+                font-size: 12px;
+              "
+            >
+              −
+            </button>
+            <button
+              onclick="pdfZoomIn()"
+              style="
+                background: var(--surface2);
+                border: 1px solid var(--border);
+                color: var(--text);
+                border-radius: 6px;
+                padding: 4px 10px;
+                cursor: pointer;
+                font-size: 12px;
+              "
+            >
+              +
+            </button>
+            <span
+              id="pdf-zoom-info"
+              style="font-size: 12px; color: var(--muted)"
+              >150%</span
+            >
+            <div style="flex: 1"></div>
+            <button
+              onclick="openAnnotated()"
+              style="
+                background: var(--accent);
+                border: none;
+                color: #0d1117;
+                border-radius: 6px;
+                padding: 4px 12px;
+                cursor: pointer;
+                font-size: 12px;
+                font-weight: 600;
+              "
+            >
+              ⬇ Download
+            </button>
           </div>
 
-          <!-- canvas + retry badge -->
-          <div id="pdf-scroll" style="position:relative;flex:1;overflow-y:auto;background:#525659;display:none;padding:16px;text-align:center;">
-            <canvas id="pdf-canvas" style="max-width:100%;box-shadow:0 4px 24px #0008;display:none;"></canvas>
-            <div id="pdf-loading" style="color:#ccc;font-size:13px;padding-top:20px;display:none;">Rendering…</div>
-            <!-- ↓ shown while polling; floats over the grey background -->
-            <div id="pdf-retry-status"></div>
+          <!-- canvas -->
+          <div
+            id="pdf-scroll"
+            style="
+              flex: 1;
+              overflow-y: auto;
+              background: #525659;
+              display: none;
+              padding: 16px;
+              text-align: center;
+            "
+          >
+            <canvas
+              id="pdf-canvas"
+              style="max-width: 100%; box-shadow: 0 4px 24px #0008"
+            ></canvas>
+            <div
+              id="pdf-loading"
+              style="
+                color: #ccc;
+                font-size: 13px;
+                margin-top: 20px;
+                display: none;
+              "
+            >
+              Rendering…
+            </div>
           </div>
 
           <!-- placeholder -->
-          <div id="pdf-placeholder" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);gap:12px;">
+          <div
+            id="pdf-placeholder"
+            style="
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              color: var(--muted);
+              gap: 12px;
+            "
+          >
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
-              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#8b949e" stroke-width="1.2"/>
-              <path d="M14 2v6h6" stroke="#8b949e" stroke-width="1.2"/>
+              <path
+                d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"
+                stroke="#8b949e"
+                stroke-width="1.2"
+              />
+              <path d="M14 2v6h6" stroke="#8b949e" stroke-width="1.2" />
             </svg>
             <p>Annotated PDF will appear here after analysis</p>
           </div>
@@ -330,10 +696,13 @@
         <!-- Flags below PDF -->
         <div class="flags-below" id="flags-below">
           <div class="flags-below-grid">
+            <!-- Cyber flags -->
             <div class="flags-below-col">
               <div class="panel-header cyber">Cyber Layer Flags</div>
               <div class="flag-list" id="flag-list-cyber"></div>
             </div>
+
+            <!-- NLP flags -->
             <div class="flags-below-col">
               <div class="panel-header nlp">NLP / Content Flags</div>
               <div class="flag-list" id="flag-list-nlp"></div>
@@ -342,38 +711,65 @@
         </div>
       </div>
 
-      <!-- ── RIGHT: Recent Scans + Timelines ── -->
+      <!-- ── RIGHT: Recent Scans + Timeline ── -->
       <div class="panel">
         <div class="panel-header">Recent Scans</div>
-        <div class="recent-scans" id="recent-scans"><div class="empty">No scans yet</div></div>
+        <div class="recent-scans" id="recent-scans">
+          <div class="empty">No scans yet</div>
+        </div>
 
-        <div class="panel-header cyber" style="margin-top:8px">Cyber Detection</div>
-        <div class="timeline" id="timeline-cyber"><div class="empty">Run an analysis to see breakdown</div></div>
+        <div class="panel-header cyber" style="margin-top: 8px">
+          Cyber Detection
+        </div>
+        <div class="timeline" id="timeline-cyber">
+          <div class="empty">Run an analysis to see breakdown</div>
+        </div>
 
-        <div class="panel-header nlp" style="margin-top:8px">NLP Detection</div>
-        <div class="timeline" id="timeline-nlp"><div class="empty">Run an analysis to see breakdown</div></div>
+        <div class="panel-header nlp" style="margin-top: 8px">
+          NLP Detection
+        </div>
+        <div class="timeline" id="timeline-nlp">
+          <div class="empty">Run an analysis to see breakdown</div>
+        </div>
       </div>
-
-    </div><!-- /.layout -->
+    </div>
 
     <script>
       let uploadedFilename = null;
-      let cyberResult     = null;
-      let fraudResult     = null;
-      let recentScans = JSON.parse(sessionStorage.getItem("docshield_scans") || "[]");
+      let cyberResult = null;
+      let fraudResult = null;
+      let recentScans = JSON.parse(
+        sessionStorage.getItem("docshield_scans") || "[]",
+      );
 
-      // ── Drag & Drop ──────────────────────────────────────────
+      // ── Drag & Drop ──
       const dz = document.getElementById("drop-zone");
-      dz.addEventListener("dragover",  (e) => { e.preventDefault(); dz.classList.add("drag"); });
-      dz.addEventListener("dragleave", ()  => dz.classList.remove("drag"));
-      dz.addEventListener("drop", (e) => { e.preventDefault(); dz.classList.remove("drag"); const f = e.dataTransfer.files[0]; if (f) handleFile(f); });
-      document.getElementById("file-input").addEventListener("change", (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+      dz.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dz.classList.add("drag");
+      });
+      dz.addEventListener("dragleave", () => dz.classList.remove("drag"));
+      dz.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dz.classList.remove("drag");
+        const f = e.dataTransfer.files[0];
+        if (f) handleFile(f);
+      });
+      document.getElementById("file-input").addEventListener("change", (e) => {
+        if (e.target.files[0]) handleFile(e.target.files[0]);
+      });
 
       function handleFile(f) {
-        if (!f.name.toLowerCase().endsWith(".pdf")) { alert("Please upload a PDF file."); return; }
+        if (!f.name.toLowerCase().endsWith(".pdf")) {
+          alert("Please upload a PDF file.");
+          return;
+        }
         document.getElementById("btn-analyze").disabled = true;
-        uploadedFilename = null; cyberResult = null; fraudResult = null;
-        document.getElementById("file-info").style.display = "block";
+        uploadedFilename = null;
+        cyberResult = null;
+        fraudResult = null;
+        const fi = document.getElementById("file-info");
+        fi.style.display = "block";
         document.getElementById("fname").textContent = f.name;
         document.getElementById("fmeta").textContent = "Uploading…";
         const fd = new FormData();
@@ -381,35 +777,48 @@
         fetch("/upload", { method: "POST", body: fd })
           .then((r) => r.json())
           .then((d) => {
-            if (d.error) { alert("Upload error: " + d.error); return; }
+            if (d.error) {
+              alert("Upload error: " + d.error);
+              return;
+            }
             uploadedFilename = d.filename;
-            document.getElementById("fmeta").textContent = `${d.size_kb} KB · Ready to analyze`;
+            document.getElementById("fmeta").textContent =
+              `${d.size_kb} KB · Ready to analyze`;
             document.getElementById("btn-analyze").disabled = false;
           })
           .catch((e) => alert("Upload failed: " + e));
       }
 
-      // ── Analysis ─────────────────────────────────────────────
+      // ── Analysis ──
       async function runAnalysis() {
         if (!uploadedFilename) return;
         document.getElementById("btn-analyze").disabled = true;
         document.getElementById("steps").style.display = "block";
         document.getElementById("result-area").style.display = "none";
         document.getElementById("flags-below").style.display = "none";
-        cyberResult = null; fraudResult = null;
+        cyberResult = null;
+        fraudResult = null;
 
         setStep("s-upload", "done");
-        setStep("s-cyber",  "active");
+        setStep("s-cyber", "active");
         try {
-          cyberResult = await post("/analyze/cyber", { filename: uploadedFilename });
+          cyberResult = await post("/analyze/cyber", {
+            filename: uploadedFilename,
+          });
           setStep("s-cyber", cyberResult.error ? "error" : "done");
-        } catch (e) { setStep("s-cyber", "error"); }
+        } catch (e) {
+          setStep("s-cyber", "error");
+        }
 
         setStep("s-fraud", "active");
         try {
-          fraudResult = await post("/analyze/fraud", { filename: uploadedFilename });
+          fraudResult = await post("/analyze/fraud", {
+            filename: uploadedFilename,
+          });
           setStep("s-fraud", fraudResult.error ? "error" : "done");
-        } catch (e) { setStep("s-fraud", "error"); }
+        } catch (e) {
+          setStep("s-fraud", "error");
+        }
 
         setStep("s-done", "done");
         renderResults();
@@ -418,22 +827,30 @@
       }
 
       function post(url, data) {
-        return fetch(url, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(data) }).then((r) => r.json());
+        return fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        }).then((r) => r.json());
       }
-      function setStep(id, state) { document.getElementById(id).className = "step " + state; }
 
-      // ── Render results ────────────────────────────────────────
+      function setStep(id, state) {
+        document.getElementById(id).className = "step " + state;
+      }
+
+      // ── Render ──
       function renderResults() {
         const cr = cyberResult || {};
         const fr = fraudResult || {};
         const cyberFlags = cr.flags || [];
-        const nlpFlags   = fr.flags || [];
-        const allFlags   = [...cyberFlags, ...nlpFlags];
+        const nlpFlags = fr.flags || [];
+        const allFlags = [...cyberFlags, ...nlpFlags];
 
         document.getElementById("result-area").style.display = "block";
 
-        const rl   = fr.risk_level || cr.risk_level || "UNKNOWN";
-        const cred = fr.credibility_score != null ? fr.credibility_score.toFixed(1) : "—";
+        const rl = fr.risk_level || cr.risk_level || "UNKNOWN";
+        const cred =
+          fr.credibility_score != null ? fr.credibility_score.toFixed(1) : "—";
 
         document.getElementById("score-cards").innerHTML = `
           <div class="score-card">
@@ -444,22 +861,23 @@
           <div class="score-card">
             <div class="label">Credibility</div>
             <div class="value">${cred}%</div>
-            <div class="sub">Doc: ${(fr.document_type || "unknown").replace("_"," ")}</div>
+            <div class="sub">Doc: ${(fr.document_type || "unknown").replace("_", " ")}</div>
           </div>
           <div class="score-card">
             <div class="label">Cyber Score</div>
-            <div class="value risk-${cr.risk_level || "LOW"}">${((cr.cyber_score || 0)*100).toFixed(0)}%</div>
+            <div class="value risk-${cr.risk_level || "LOW"}">${((cr.cyber_score || 0) * 100).toFixed(0)}%</div>
             <div class="sub">${cr.risk_level || "—"}</div>
           </div>
           <div class="score-card">
             <div class="label">Flags</div>
             <div class="value">${allFlags.length}</div>
             <div class="sub">
-              <span style="color:var(--critical)">${allFlags.filter((f)=>f.severity==="CRITICAL").length} crit</span>
+              <span style="color:var(--critical)">${allFlags.filter((f) => f.severity === "CRITICAL").length} crit</span>
               &nbsp;
-              <span style="color:var(--high)">${allFlags.filter((f)=>f.severity==="HIGH").length} high</span>
+              <span style="color:var(--high)">${allFlags.filter((f) => f.severity === "HIGH").length} high</span>
             </div>
-          </div>`;
+          </div>
+        `;
 
         let dlHtml = `<button class="btn btn-secondary" onclick="downloadReport()">⬇ JSON Report</button>`;
         if (fr.annotated_pdf) {
@@ -468,82 +886,180 @@
         document.getElementById("dl-row").innerHTML = dlHtml;
 
         if (fr.annotated_pdf) {
-          // ── FIX (Issue 2): wait until file is fully written before loading ──
-          loadPdfViewerWhenReady(`/download/${fr.annotated_pdf}`);
+          loadPdfViewer(`/download/${fr.annotated_pdf}`);
           document.getElementById("flags-below").style.display = "block";
         }
 
         renderFlagList(cyberFlags, "flag-list-cyber");
-        renderFlagList(nlpFlags,   "flag-list-nlp");
+        renderFlagList(nlpFlags, "flag-list-nlp");
         renderTimelineCyber(cyberFlags);
         renderTimelineNlp(nlpFlags);
       }
 
       function renderFlagList(flags, elementId) {
-        const order  = ["CRITICAL","HIGH","MEDIUM","LOW"];
-        const sorted = [...flags].sort((a,b) => order.indexOf(a.severity) - order.indexOf(b.severity));
-        document.getElementById(elementId).innerHTML = sorted.length === 0
-          ? '<div class="empty" style="color:var(--low)">No flags detected</div>'
-          : sorted.map((f) => `
-              <div class="flag ${f.severity}">
-                <div class="flag-type">${f.severity} · ${(f.type||"").replace(/_/g," ")}</div>
-                <div class="flag-desc">${f.description||""}</div>
-                <div class="flag-conf">Confidence: ${((f.confidence||0)*100).toFixed(0)}%</div>
-              </div>`).join("");
+        const order = ["CRITICAL", "HIGH", "MEDIUM", "LOW"];
+        const sorted = [...flags].sort(
+          (a, b) => order.indexOf(a.severity) - order.indexOf(b.severity),
+        );
+        if (sorted.length === 0) {
+          document.getElementById(elementId).innerHTML =
+            '<div class="empty" style="color:var(--low)">No flags detected</div>';
+        } else {
+          document.getElementById(elementId).innerHTML = sorted
+            .map(
+              (f) => `
+            <div class="flag ${f.severity}">
+              <div class="flag-type">${f.severity} · ${(f.type || "").replace(/_/g, " ")}</div>
+              <div class="flag-desc">${f.description || ""}</div>
+              <div class="flag-conf">Confidence: ${((f.confidence || 0) * 100).toFixed(0)}%</div>
+            </div>
+          `,
+            )
+            .join("");
+        }
       }
 
       function renderTimelineCyber(flags) {
         const tl = document.getElementById("timeline-cyber");
-        if (!flags.length) { tl.innerHTML = '<div class="empty" style="color:var(--low)">All cyber checks clean</div>'; return; }
-        tl.innerHTML = buildTimelineHtml(flags, [
-          { label:"Hash / Resubmission", types:["resubmission_detected","duplicate_document"] },
-          { label:"Metadata",            types:["author_missing","rapid_modification","suspicious_creator_tool"] },
-          { label:"File Anomalies",      types:["pdf_encrypted","embedded_javascript","embedded_attachments","suspicious_page_count","suspicious_file_size"] },
-          { label:"Scan Detection",      types:["fully_scanned_document","mixed_document","low_resolution_scan","inconsistent_resolution"] },
-        ]);
+        if (!flags.length) {
+          tl.innerHTML =
+            '<div class="empty" style="color:var(--low)">All cyber checks clean</div>';
+          return;
+        }
+        const checks = [
+          {
+            label: "Hash / Resubmission",
+            types: ["resubmission_detected", "duplicate_document"],
+          },
+          {
+            label: "Metadata",
+            types: [
+              "author_missing",
+              "rapid_modification",
+              "suspicious_creator_tool",
+            ],
+          },
+          {
+            label: "File Anomalies",
+            types: [
+              "pdf_encrypted",
+              "embedded_javascript",
+              "embedded_attachments",
+              "suspicious_page_count",
+              "suspicious_file_size",
+            ],
+          },
+          {
+            label: "Scan Detection",
+            types: [
+              "fully_scanned_document",
+              "mixed_document",
+              "low_resolution_scan",
+              "inconsistent_resolution",
+            ],
+          },
+        ];
+        tl.innerHTML = buildTimelineHtml(flags, checks);
       }
 
       function renderTimelineNlp(flags) {
         const tl = document.getElementById("timeline-nlp");
-        if (!flags.length) { tl.innerHTML = '<div class="empty" style="color:var(--low)">All NLP checks clean</div>'; return; }
-        tl.innerHTML = buildTimelineHtml(flags, [
-          { label:"Salary Math",        types:["salary_logic_error","salary_deduction_mismatch","gross_salary_mismatch","ctc_mismatch"] },
-          { label:"TDS / Tax",          types:["annual_tds_mismatch","tds_mismatch"] },
-          { label:"PAN / IFSC",         types:["pan_missing","pan_invalid_entity","ifsc_missing","ifsc_bank_mismatch","multiple_pan_numbers","multiple_ifsc_codes"] },
-          { label:"Dates",              types:["future_date","FUTURE_DATE","date_range_suspicious"] },
-          { label:"Font / Format",      types:["font_inconsistency","excessive_font_variety"] },
-          { label:"OCR / Negative",     types:["ocr_corruption","negative_amount"] },
-          { label:"Company",            types:["unverified_company","invalid_cin"] },
-          { label:"Income vs Profession",types:["income_too_high","income_too_low"] },
-        ]);
+        if (!flags.length) {
+          tl.innerHTML =
+            '<div class="empty" style="color:var(--low)">All NLP checks clean</div>';
+          return;
+        }
+        const checks = [
+          {
+            label: "Salary Math",
+            types: [
+              "salary_logic_error",
+              "salary_deduction_mismatch",
+              "gross_salary_mismatch",
+              "ctc_mismatch",
+            ],
+          },
+          {
+            label: "TDS / Tax",
+            types: ["annual_tds_mismatch", "tds_mismatch"],
+          },
+          {
+            label: "PAN / IFSC",
+            types: [
+              "pan_missing",
+              "pan_invalid_entity",
+              "ifsc_missing",
+              "ifsc_bank_mismatch",
+              "multiple_pan_numbers",
+              "multiple_ifsc_codes",
+            ],
+          },
+          {
+            label: "Dates",
+            types: ["future_date", "FUTURE_DATE", "date_range_suspicious"],
+          },
+          {
+            label: "Font / Format",
+            types: ["font_inconsistency", "excessive_font_variety"],
+          },
+          {
+            label: "OCR / Negative",
+            types: ["ocr_corruption", "negative_amount"],
+          },
+          { label: "Company", types: ["unverified_company", "invalid_cin"] },
+          {
+            label: "Income vs Profession",
+            types: ["income_too_high", "income_too_low"],
+          },
+        ];
+        tl.innerHTML = buildTimelineHtml(flags, checks);
       }
 
       function buildTimelineHtml(flags, checks) {
-        const sevScore = { CRITICAL:1.0, HIGH:0.75, MEDIUM:0.5, LOW:0.25 };
-        const colors   = { CRITICAL:"var(--critical)", HIGH:"var(--high)", MEDIUM:"var(--medium)", LOW:"var(--low)" };
-        const typeMap  = {};
-        flags.forEach((f) => { typeMap[f.type] = f; });
-        return checks.map((c) => {
-          const hits   = c.types.map((t) => typeMap[t]).filter(Boolean);
-          const count  = hits.length;
-          const maxSev = [...hits].sort((a,b) => sevScore[b.severity] - sevScore[a.severity])[0];
-          const pct    = count === 0 ? 0 : Math.min(100, count*35);
-          const color  = maxSev ? colors[maxSev.severity] : "var(--low)";
-          const lbl2   = count === 0 ? "clean" : `${count} flag${count>1?"s":""}`;
-          return `
+        const sevScore = { CRITICAL: 1.0, HIGH: 0.75, MEDIUM: 0.5, LOW: 0.25 };
+        const colors = {
+          CRITICAL: "var(--critical)",
+          HIGH: "var(--high)",
+          MEDIUM: "var(--medium)",
+          LOW: "var(--low)",
+        };
+        const typeMap = {};
+        flags.forEach((f) => {
+          typeMap[f.type] = f;
+        });
+        let html = "";
+        checks.forEach((c) => {
+          const hits = c.types.map((t) => typeMap[t]).filter(Boolean);
+          const count = hits.length;
+          const maxSev = [...hits].sort(
+            (a, b) => sevScore[b.severity] - sevScore[a.severity],
+          )[0];
+          const pct = count === 0 ? 0 : Math.min(100, count * 35);
+          const color = maxSev ? colors[maxSev.severity] : "var(--low)";
+          const label2 =
+            count === 0 ? "clean" : `${count} flag${count > 1 ? "s" : ""}`;
+          html += `
             <div class="tl-bar-wrap">
-              <div class="tl-label"><span>${c.label}</span><span style="color:${color}">${lbl2}</span></div>
+              <div class="tl-label"><span>${c.label}</span><span style="color:${color}">${label2}</span></div>
               <div class="tl-bar-bg"><div class="tl-bar" style="width:${pct}%;background:${color}"></div></div>
             </div>`;
-        }).join("");
+        });
+        return html;
       }
 
       function addToRecentScans() {
         const cr = cyberResult || {};
         const fr = fraudResult || {};
-        const allFlags = [...(cr.flags||[]), ...(fr.flags||[])];
+        const allFlags = [...(cr.flags || []), ...(fr.flags || [])];
         const rl = fr.risk_level || cr.risk_level || "UNKNOWN";
-        recentScans.unshift({ name: uploadedFilename, risk: rl, flags: allFlags.length, time: new Date().toLocaleTimeString(), annotated: fr.annotated_pdf || null });
+        const entry = {
+          name: uploadedFilename,
+          risk: rl,
+          flags: allFlags.length,
+          time: new Date().toLocaleTimeString(),
+          annotated: fr.annotated_pdf || null,
+        };
+        recentScans.unshift(entry);
         if (recentScans.length > 10) recentScans.pop();
         sessionStorage.setItem("docshield_scans", JSON.stringify(recentScans));
         renderRecentScans();
@@ -551,8 +1067,13 @@
 
       function renderRecentScans() {
         const el = document.getElementById("recent-scans");
-        if (!recentScans.length) { el.innerHTML = '<div class="empty">No scans yet</div>'; return; }
-        el.innerHTML = recentScans.map((s,i) => `
+        if (!recentScans.length) {
+          el.innerHTML = '<div class="empty">No scans yet</div>';
+          return;
+        }
+        el.innerHTML = recentScans
+          .map(
+            (s, i) => `
           <div class="scan-item" onclick="loadScan(${i})">
             <div class="scan-name">${s.name}</div>
             <div class="scan-meta">
@@ -560,12 +1081,15 @@
               <span>${s.flags} flags</span>
               <span>${s.time}</span>
             </div>
-          </div>`).join("");
+          </div>
+        `,
+          )
+          .join("");
       }
 
       function loadScan(i) {
         const s = recentScans[i];
-        if (s.annotated) loadPdfViewerWhenReady(`/download/${s.annotated}`);
+        if (s.annotated) loadPdfViewer(`/download/${s.annotated}`);
       }
 
       function openAnnotated() {
@@ -575,87 +1099,47 @@
 
       function downloadReport() {
         if (!uploadedFilename) return;
-        fetch("/report", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ cyber:cyberResult, fraud:fraudResult, filename:uploadedFilename }) })
+        fetch("/report", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            cyber: cyberResult,
+            fraud: fraudResult,
+            filename: uploadedFilename,
+          }),
+        })
           .then((r) => r.blob())
-          .then((b) => { const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = `docshield_report_${Date.now()}.json`; a.click(); });
+          .then((b) => {
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(b);
+            a.download = `docshield_report_${Date.now()}.json`;
+            a.click();
+          });
       }
 
-      // ══════════════════════════════════════════════════════════
-      // FIX — Issue 2: Retry-based PDF loader
-      //
-      // Root cause: the NLP annotator writes the PDF to disk while
-      // Flask immediately returns its filename in the JSON response.
-      // The old code called loadPdfViewer() straight away, so PDF.js
-      // fetched a truncated or still-open file — producing a blank or
-      // broken render that only "worked" after several manual refreshes
-      // (by which time the file was finally complete).
-      //
-      // Fix: before passing the URL to PDF.js we poll the /download
-      // endpoint with lightweight HEAD requests (no body) until the
-      // server returns HTTP 200 — meaning the file exists and is
-      // accessible. We wait PDF_RETRY_DELAY_MS between attempts and
-      // give up after PDF_RETRY_MAX tries, showing a user-friendly
-      // status badge the whole time.
-      // ══════════════════════════════════════════════════════════
-
-      const PDF_RETRY_MAX      = 12;   // max polls (~7 s total)
-      const PDF_RETRY_DELAY_MS = 600;  // ms between polls
-
-      function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
-
-      function setRetryStatus(msg) {
-        const el = document.getElementById("pdf-retry-status");
-        if (!el) return;
-        el.textContent    = msg || "";
-        el.style.display  = msg ? "block" : "none";
-      }
-
-      async function loadPdfViewerWhenReady(url) {
-        // Show the scroll area immediately so the badge has a home
-        document.getElementById("pdf-placeholder").style.display = "none";
-        document.getElementById("pdf-scroll").style.display      = "block";
-        document.getElementById("pdf-toolbar").style.display     = "flex";
-        document.getElementById("pdf-loading").style.display     = "block";
-        document.getElementById("pdf-loading").textContent       = "Preparing annotated PDF…";
-        document.getElementById("pdf-canvas").style.display      = "none";
-
-        for (let attempt = 1; attempt <= PDF_RETRY_MAX; attempt++) {
-          try {
-            const res = await fetch(url, { method: "HEAD" });
-            if (res.ok) {
-              setRetryStatus(null);          // hide badge
-              loadPdfViewer(url);            // hand off to PDF.js
-              return;
-            }
-          } catch (_) { /* network blip — keep going */ }
-
-          if (attempt < PDF_RETRY_MAX) {
-            setRetryStatus(`Waiting for annotated PDF… (${attempt}/${PDF_RETRY_MAX})`);
-            await sleep(PDF_RETRY_DELAY_MS);
-          }
-        }
-
-        // Exhausted all retries
-        setRetryStatus(null);
-        document.getElementById("pdf-loading").textContent =
-          "PDF is taking longer than expected — use the Download button above.";
-      }
-
-      // ── PDF.js core ───────────────────────────────────────────
-      let pdfDoc = null, pdfCurrentPage = 1, pdfScale = 1.5, pdfUrl = null, pdfRendering = false;
+      // ── PDF.js ──
+      let pdfDoc = null,
+        pdfCurrentPage = 1,
+        pdfScale = 1.5,
+        pdfUrl = null,
+        pdfRendering = false;
 
       function loadPdfViewer(url) {
-        pdfUrl = url; pdfCurrentPage = 1; pdfScale = 1.5;
+        pdfUrl = url;
+        pdfCurrentPage = 1;
+        pdfScale = 1.5;
         document.getElementById("pdf-placeholder").style.display = "none";
-        document.getElementById("pdf-scroll").style.display      = "block";
-        document.getElementById("pdf-toolbar").style.display     = "flex";
-        document.getElementById("pdf-loading").style.display     = "block";
-        document.getElementById("pdf-loading").textContent       = "Rendering…";
-        document.getElementById("pdf-canvas").style.display      = "none";
-
-        if (window.pdfjsLib) { _doPdfLoad(url); return; }
+        document.getElementById("pdf-scroll").style.display = "block";
+        document.getElementById("pdf-toolbar").style.display = "flex";
+        document.getElementById("pdf-loading").style.display = "block";
+        document.getElementById("pdf-canvas").style.display = "none";
+        if (window.pdfjsLib) {
+          _doPdfLoad(url);
+          return;
+        }
         const s = document.createElement("script");
-        s.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+        s.src =
+          "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
         s.onload = () => {
           window.pdfjsLib.GlobalWorkerOptions.workerSrc =
             "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
@@ -665,10 +1149,16 @@
       }
 
       function _doPdfLoad(url) {
-        pdfjsLib.getDocument(url).promise
-          .then((doc) => { pdfDoc = doc; updatePageInfo(); renderPage(pdfCurrentPage); })
-          .catch((e)  => {
-            document.getElementById("pdf-loading").textContent = "Could not render PDF: " + e.message;
+        pdfjsLib
+          .getDocument(url)
+          .promise.then((doc) => {
+            pdfDoc = doc;
+            updatePageInfo();
+            renderPage(pdfCurrentPage);
+          })
+          .catch((e) => {
+            document.getElementById("pdf-loading").textContent =
+              "Could not render PDF: " + e.message;
             document.getElementById("pdf-loading").style.display = "block";
           });
       }
@@ -677,13 +1167,13 @@
         if (!pdfDoc || pdfRendering) return;
         pdfRendering = true;
         document.getElementById("pdf-loading").style.display = "block";
-        document.getElementById("pdf-canvas").style.display  = "none";
+        document.getElementById("pdf-canvas").style.display = "none";
         pdfDoc.getPage(num).then((page) => {
           const viewport = page.getViewport({ scale: pdfScale });
-          const canvas   = document.getElementById("pdf-canvas");
-          const ctx      = canvas.getContext("2d");
-          canvas.height  = viewport.height;
-          canvas.width   = viewport.width;
+          const canvas = document.getElementById("pdf-canvas");
+          const ctx = canvas.getContext("2d");
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
           page.render({ canvasContext: ctx, viewport }).promise.then(() => {
             pdfRendering = false;
             document.getElementById("pdf-loading").style.display = "none";
@@ -696,14 +1186,30 @@
 
       function updatePageInfo() {
         if (!pdfDoc) return;
-        document.getElementById("pdf-page-info").textContent = `Page ${pdfCurrentPage} / ${pdfDoc.numPages}`;
-        document.getElementById("pdf-zoom-info").textContent = `${Math.round(pdfScale*100)}%`;
+        document.getElementById("pdf-page-info").textContent =
+          `Page ${pdfCurrentPage} / ${pdfDoc.numPages}`;
+        document.getElementById("pdf-zoom-info").textContent =
+          `${Math.round(pdfScale * 100)}%`;
       }
 
-      function pdfPrevPage() { if (!pdfDoc || pdfCurrentPage <= 1) return; pdfCurrentPage--; renderPage(pdfCurrentPage); }
-      function pdfNextPage() { if (!pdfDoc || pdfCurrentPage >= pdfDoc.numPages) return; pdfCurrentPage++; renderPage(pdfCurrentPage); }
-      function pdfZoomIn()   { pdfScale = Math.min(pdfScale+0.25, 3.0); renderPage(pdfCurrentPage); }
-      function pdfZoomOut()  { pdfScale = Math.max(pdfScale-0.25, 0.5); renderPage(pdfCurrentPage); }
+      function pdfPrevPage() {
+        if (!pdfDoc || pdfCurrentPage <= 1) return;
+        pdfCurrentPage--;
+        renderPage(pdfCurrentPage);
+      }
+      function pdfNextPage() {
+        if (!pdfDoc || pdfCurrentPage >= pdfDoc.numPages) return;
+        pdfCurrentPage++;
+        renderPage(pdfCurrentPage);
+      }
+      function pdfZoomIn() {
+        pdfScale = Math.min(pdfScale + 0.25, 3.0);
+        renderPage(pdfCurrentPage);
+      }
+      function pdfZoomOut() {
+        pdfScale = Math.max(pdfScale - 0.25, 0.5);
+        renderPage(pdfCurrentPage);
+      }
 
       renderRecentScans();
     </script>
