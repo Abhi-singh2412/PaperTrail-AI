@@ -16,22 +16,51 @@ Requires SUPABASE_URL and SUPABASE_SECRET_KEY environment variables.
 See supabase_setup.sql for the one-time table setup.
 """
 
-from flask import Flask, request, jsonify, send_file, send_from_directory
+from flask import Flask, request, jsonify, send_file, send_from_directory, session
 from flask_cors import CORS
 from supabase import create_client, Client
 from dotenv import load_dotenv
+from pypdf import PdfReader, PdfWriter
 import os
 import json
 import hashlib
 import hmac
 import secrets
+import string
 import traceback
 from datetime import datetime
 
 load_dotenv()  # reads a .env file in the project root, if present
 
 app = Flask(__name__, static_folder='static')
-CORS(app)
+
+# IMPORTANT: this must stay the SAME value across server restarts, or every
+# existing session cookie becomes invalid the instant the server reloads
+# (which Flask's debug mode does constantly). A random fallback that
+# regenerates on every restart is exactly what was silently breaking
+# "logged in" state -> uploads/analysis would 401 internally, but the
+# frontend showed no annotated PDF / no stats with no visible error.
+FLASK_SECRET_KEY = os.environ.get('FLASK_SECRET_KEY')
+if not FLASK_SECRET_KEY:
+    raise RuntimeError(
+        'Missing FLASK_SECRET_KEY environment variable. Set it to any '
+        'long random string and keep it the same across restarts, e.g.\n'
+        '  FLASK_SECRET_KEY=' + secrets.token_hex(32) + '\n'
+        '(generated just now — copy it into your .env file)'
+    )
+app.secret_key = FLASK_SECRET_KEY
+
+# Session cookie behaves on plain http://localhost during development.
+# If you deploy behind https in production, set SESSION_COOKIE_SECURE=true.
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_SECURE'] = os.environ.get('SESSION_COOKIE_SECURE', 'false').lower() == 'true'
+
+# Explicit origin (not "*") is required for the browser to accept a
+# credentialed (cookie-carrying) request at all -- this is a CORS spec
+# rule, not a Flask quirk. Adjust ALLOWED_ORIGIN if you serve the
+# frontend from a different host/port than the Flask app itself.
+ALLOWED_ORIGIN = os.environ.get('ALLOWED_ORIGIN', 'http://localhost:5000')
+CORS(app, supports_credentials=True, origins=[ALLOWED_ORIGIN])
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
 OUTPUT_FOLDER = os.path.join(os.path.dirname(__file__), 'outputs')
@@ -97,6 +126,121 @@ def _create_user(email, password_hash, salt):
         'salt': salt,
     }).execute()
 
+
+# ──────────────────────────────────────────────────────────────
+# Document storage (Supabase Storage + documents table)
+# ──────────────────────────────────────────────────────────────
+
+ORIGINAL_BUCKET = 'original-pdfs'
+ANNOTATED_BUCKET = 'annotated-pdfs'
+
+
+def _ensure_buckets():
+    """Create the two storage buckets if they don't exist yet. Private —
+    files are not reachable by a public URL; access goes through the
+    secret key on the server."""
+    try:
+        existing = {b.name for b in supabase.storage.list_buckets()}
+    except Exception:
+        existing = set()
+    for bucket in (ORIGINAL_BUCKET, ANNOTATED_BUCKET):
+        if bucket not in existing:
+            try:
+                supabase.storage.create_bucket(
+                    bucket,
+                    options={'public': False}
+                )
+            except Exception:
+                pass  # likely already exists or a race with another worker
+
+
+_ensure_buckets()
+
+
+def _upload_to_storage(bucket, storage_path, local_path):
+    """Upload a local file to a Supabase Storage bucket. Returns the
+    storage path on success, None on failure (caller decides how to react)."""
+    try:
+        with open(local_path, 'rb') as f:
+            file_bytes = f.read()
+        supabase.storage.from_(bucket).upload(
+            storage_path,
+            file_bytes,
+            {'content-type': 'application/pdf'}
+        )
+        return storage_path
+    except Exception as e:
+        print(f"[storage] upload failed for {bucket}/{storage_path}: {e}")
+        return None
+
+
+def _save_document_record(user_email, original_filename,
+                           original_storage_path, annotated_storage_path,
+                           cyber_result, fraud_result, pdf_password=None):
+    risk_level = (fraud_result or {}).get('risk_level') or (cyber_result or {}).get('risk_level') or 'UNKNOWN'
+    credibility = (fraud_result or {}).get('credibility_score')
+    try:
+        supabase.table('documents').insert({
+            'user_email': user_email,
+            'original_filename': original_filename,
+            'original_storage_path': original_storage_path,
+            'annotated_storage_path': annotated_storage_path,
+            'pdf_password': pdf_password,
+            'risk_level': risk_level,
+            'credibility_score': credibility,
+            'cyber_result': cyber_result,
+            'fraud_result': fraud_result,
+        }).execute()
+    except Exception as e:
+        print(f"[db] failed to save document record: {e}")
+
+
+# ──────────────────────────────────────────────────────────────
+# PDF password protection
+# ──────────────────────────────────────────────────────────────
+# The annotated PDF is encrypted with a random password BEFORE it is
+# uploaded to Supabase Storage, so the file sitting in Storage is
+# protected even if someone downloads it directly from the Supabase
+# dashboard or grabs the raw URL -- not just when going through this
+# app's own /download route.
+#
+# The password is generated fresh per document, shown to the user once
+# in the analysis response (so the frontend can display it), and saved
+# in the documents table so it can be re-shown if the user revisits an
+# old scan. It is NEVER derived from or related to the user's login
+# password -- using a login credential to encrypt a file that may end
+# up shared or stored elsewhere would let that file leak the password
+# used to access the account itself.
+
+PDF_PASSWORD_LENGTH = 10
+PDF_PASSWORD_ALPHABET = string.ascii_uppercase + string.ascii_lowercase + string.digits
+
+
+def _generate_pdf_password():
+    return ''.join(secrets.choice(PDF_PASSWORD_ALPHABET) for _ in range(PDF_PASSWORD_LENGTH))
+
+
+def _encrypt_pdf_in_place(pdf_path, password):
+    """Encrypts the PDF at pdf_path with the given password, overwriting it.
+    Returns True on success, False on failure (caller decides how to react)."""
+    try:
+        reader = PdfReader(pdf_path)
+        writer = PdfWriter()
+        for page in reader.pages:
+            writer.add_page(page)
+        # user_password: required to open/view the PDF at all.
+        # owner_password: a separate, stronger random secret that grants full
+        # permissions (printing, editing). We set it too, rather than reusing
+        # the same value, because pypdf disallows an empty owner password.
+        owner_password = secrets.token_hex(16)
+        writer.encrypt(user_password=password, owner_password=owner_password)
+        with open(pdf_path, 'wb') as f:
+            writer.write(f)
+        return True
+    except Exception as e:
+        print(f"[pdf] encryption failed for {pdf_path}: {e}")
+        return False
+
 # ──────────────────────────────────────────────────────────────
 # Serve the frontend
 # ──────────────────────────────────────────────────────────────
@@ -142,6 +286,7 @@ def signup():
         # Most likely a race on the unique email index, or a connection issue
         return jsonify({'error': 'Could not create account. Please try again.'}), 500
 
+    session['user_email'] = email
     return jsonify({'ok': True, 'email': email})
 
 
@@ -159,7 +304,23 @@ def login():
     if not hmac.compare_digest(check_hash, user['password_hash']):
         return jsonify({'error': 'Incorrect password.'}), 401
 
+    session['user_email'] = email
     return jsonify({'ok': True, 'email': email})
+
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.pop('user_email', None)
+    return jsonify({'ok': True})
+
+
+@app.route('/me')
+def me():
+    """Lets the frontend check who's logged in (or get a 401 if no one is)."""
+    email = session.get('user_email')
+    if not email:
+        return jsonify({'error': 'Not logged in'}), 401
+    return jsonify({'email': email})
 
 
 # ──────────────────────────────────────────────────────────────
@@ -168,6 +329,10 @@ def login():
 
 @app.route('/upload', methods=['POST'])
 def upload():
+    user_email = session.get('user_email')
+    if not user_email:
+        return jsonify({'error': 'Please log in first.'}), 401
+
     if 'file' not in request.files:
         return jsonify({'error': 'No file uploaded'}), 400
 
@@ -179,6 +344,11 @@ def upload():
     safe_name = f"doc_{timestamp}.pdf"
     save_path = os.path.join(UPLOAD_FOLDER, safe_name)
     f.save(save_path)
+
+    # Mirror the original PDF into Supabase Storage, namespaced by user email
+    # so each user's files live in their own "folder" inside the bucket.
+    storage_path = f"{user_email}/{safe_name}"
+    _upload_to_storage(ORIGINAL_BUCKET, storage_path, save_path)
 
     return jsonify({
         'success': True,
@@ -194,6 +364,9 @@ def upload():
 
 @app.route('/analyze/cyber', methods=['POST'])
 def analyze_cyber():
+    if not session.get('user_email'):
+        return jsonify({'error': 'Please log in first.'}), 401
+
     data = request.get_json()
     filename = data.get('filename')
     if not filename:
@@ -217,8 +390,13 @@ def analyze_cyber():
 
 @app.route('/analyze/fraud', methods=['POST'])
 def analyze_fraud():
+    user_email = session.get('user_email')
+    if not user_email:
+        return jsonify({'error': 'Please log in first.'}), 401
+
     data = request.get_json()
     filename = data.get('filename')
+    cyber_result = data.get('cyber_result')  # optional, passed from frontend if available
     if not filename:
         return jsonify({'error': 'No filename provided'}), 400
 
@@ -229,9 +407,44 @@ def analyze_fraud():
     try:
         from fraud_detector_module import run_fraud_analysis
         result = run_fraud_analysis(pdf_path, OUTPUT_FOLDER)
-        return jsonify(result)
     except Exception as e:
         return jsonify({'error': str(e), 'trace': traceback.format_exc()}), 500
+
+    # Push the annotated PDF (if one was generated) to Supabase Storage,
+    # encrypted with a freshly generated random password, and record this
+    # scan in the documents table.
+    annotated_storage_path = None
+    pdf_password = None
+    annotated_name = result.get('annotated_pdf')
+    if annotated_name:
+        annotated_local_path = os.path.join(OUTPUT_FOLDER, annotated_name)
+        if os.path.exists(annotated_local_path):
+            pdf_password = _generate_pdf_password()
+            encrypted_ok = _encrypt_pdf_in_place(annotated_local_path, pdf_password)
+            if not encrypted_ok:
+                # Don't silently hand back an unprotected file -- surface it.
+                pdf_password = None
+            annotated_storage_path = f"{user_email}/{annotated_name}"
+            _upload_to_storage(ANNOTATED_BUCKET, annotated_storage_path, annotated_local_path)
+
+    original_storage_path = f"{user_email}/{filename}"
+    _save_document_record(
+        user_email=user_email,
+        original_filename=filename,
+        original_storage_path=original_storage_path,
+        annotated_storage_path=annotated_storage_path,
+        cyber_result=cyber_result,
+        fraud_result=result,
+        pdf_password=pdf_password,
+    )
+
+    # Shown once to the user right after analysis completes. The frontend
+    # is responsible for displaying this clearly and noting it won't be
+    # shown again automatically (it CAN be looked up again via the
+    # documents table / a "show password" action if you build one).
+    result['pdf_password'] = pdf_password
+
+    return jsonify(result)
 
 
 # ──────────────────────────────────────────────────────────────
@@ -279,4 +492,12 @@ if __name__ == '__main__':
     print("  Document Fraud Detection System")
     print("  Open: http://localhost:5000")
     print("="*60 + "\n")
-    app.run(debug=True, port=5000, host='0.0.0.0')
+    # use_reloader=False: the auto-reloader watches every imported .py file
+    # (including deep into torch's internals) and restarts the whole server
+    # the instant any of them gets touched -- which happens the first time
+    # fraud_detector_module imports torch / an NLP model. That restart kills
+    # the in-flight /analyze/fraud request, which is why the browser saw
+    # "failed to fetch" right as that request started. debug=True still
+    # gives you full tracebacks in the browser; only the file-watching
+    # auto-restart is disabled.
+    app.run(debug=True, use_reloader=False, port=5000, host='0.0.0.0')

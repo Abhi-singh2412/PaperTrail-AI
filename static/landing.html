@@ -762,6 +762,7 @@
         try {
           const res = await fetch(isLogin ? "/login" : "/signup", {
             method: "POST",
+            credentials: "include",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               email: emailEl.value.trim(),

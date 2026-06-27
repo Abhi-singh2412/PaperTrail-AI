@@ -275,6 +275,71 @@
         flex: 1;
       }
 
+      /* ── PDF password banner ── */
+      .pw-banner {
+        margin: 0 16px 16px;
+        background: #58a6ff14;
+        border: 1px solid #58a6ff55;
+        border-radius: var(--radius);
+        padding: 12px;
+      }
+      .pw-banner .pw-title {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--accent);
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .pw-banner .pw-value-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .pw-banner .pw-value {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 6px 10px;
+        flex: 1;
+        user-select: all;
+      }
+      .pw-banner .pw-copy {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity 0.15s;
+        flex-shrink: 0;
+      }
+      .pw-banner .pw-copy:hover {
+        opacity: 0.8;
+      }
+      .pw-banner .pw-note {
+        font-size: 11px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      .pw-banner.pw-error {
+        background: #f8514914;
+        border-color: #f8514955;
+      }
+      .pw-banner.pw-error .pw-title {
+        color: var(--critical);
+      }
+
       /* ── Center panel layout ── */
       .center-panel {
         position: relative;
@@ -534,6 +599,7 @@
 
         <div id="result-area" style="display: none">
           <div class="scores" id="score-cards"></div>
+          <div id="pdf-password-banner" style="display: none"></div>
           <div class="dl-row" id="dl-row"></div>
         </div>
       </div>
@@ -742,6 +808,15 @@
         sessionStorage.getItem("docshield_scans") || "[]",
       );
 
+      // ── Auth guard ──
+      fetch("/me", { credentials: "include" })
+        .then((r) => {
+          if (!r.ok) window.location.href = "/";
+        })
+        .catch(() => {
+          window.location.href = "/";
+        });
+
       // ── Drag & Drop ──
       const dz = document.getElementById("drop-zone");
       dz.addEventListener("dragover", (e) => {
@@ -774,7 +849,7 @@
         document.getElementById("fmeta").textContent = "Uploading…";
         const fd = new FormData();
         fd.append("file", f);
-        fetch("/upload", { method: "POST", body: fd })
+        fetch("/upload", { method: "POST", credentials: "include", body: fd })
           .then((r) => r.json())
           .then((d) => {
             if (d.error) {
@@ -806,8 +881,12 @@
             filename: uploadedFilename,
           });
           setStep("s-cyber", cyberResult.error ? "error" : "done");
+          if (cyberResult.error) {
+            alert("Cyber analysis failed: " + cyberResult.error);
+          }
         } catch (e) {
           setStep("s-cyber", "error");
+          alert("Cyber analysis request failed: " + e.message);
         }
 
         setStep("s-fraud", "active");
@@ -816,8 +895,12 @@
             filename: uploadedFilename,
           });
           setStep("s-fraud", fraudResult.error ? "error" : "done");
+          if (fraudResult.error) {
+            alert("Fraud analysis failed: " + fraudResult.error);
+          }
         } catch (e) {
           setStep("s-fraud", "error");
+          alert("Fraud analysis request failed: " + e.message);
         }
 
         setStep("s-done", "done");
@@ -829,6 +912,7 @@
       function post(url, data) {
         return fetch(url, {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
         }).then((r) => r.json());
@@ -885,8 +969,10 @@
         }
         document.getElementById("dl-row").innerHTML = dlHtml;
 
+        renderPdfPasswordBanner(fr.pdf_password, fr.annotated_pdf);
+
         if (fr.annotated_pdf) {
-          loadPdfViewer(`/download/${fr.annotated_pdf}`);
+          loadPdfViewer(`/download/${fr.annotated_pdf}`, fr.pdf_password);
           document.getElementById("flags-below").style.display = "block";
         }
 
@@ -894,6 +980,89 @@
         renderFlagList(nlpFlags, "flag-list-nlp");
         renderTimelineCyber(cyberFlags);
         renderTimelineNlp(nlpFlags);
+      }
+
+      function renderPdfPasswordBanner(password, annotatedPdf) {
+        const el = document.getElementById("pdf-password-banner");
+        if (!annotatedPdf) {
+          el.style.display = "none";
+          return;
+        }
+        if (password) {
+          el.className = "pw-banner";
+          el.innerHTML = `
+            <div class="pw-title">🔒 Annotated PDF Password</div>
+            <div class="pw-value-row">
+              <span class="pw-value" id="pw-value-text">${password}</span>
+              <button class="pw-copy" onclick="copyPdfPassword()">Copy</button>
+            </div>
+            <div class="pw-note">Save this now — you'll need it to open the annotated PDF, including if you download it directly from storage. It won't be shown here again after you leave this page.</div>
+          `;
+        } else {
+          el.className = "pw-banner pw-error";
+          el.innerHTML = `
+            <div class="pw-title">⚠ Encryption Failed</div>
+            <div class="pw-note">The annotated PDF could not be password-protected. It is still available below, but is not encrypted.</div>
+          `;
+        }
+        el.style.display = "block";
+      }
+
+      function copyPdfPassword() {
+        const textEl = document.getElementById("pw-value-text");
+        const text = textEl?.textContent;
+        if (!text) return;
+
+        const showCopied = () => {
+          const btn = document.querySelector(".pw-copy");
+          if (btn) {
+            const original = btn.textContent;
+            btn.textContent = "Copied!";
+            setTimeout(() => (btn.textContent = original), 1500);
+          }
+        };
+
+        // Clipboard API requires a secure context (https, or localhost).
+        // On http://127.0.0.1 or other plain-http origins it's unavailable
+        // or silently rejects -- fall back to the old selection+execCommand
+        // trick, which works everywhere.
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard
+            .writeText(text)
+            .then(showCopied)
+            .catch(() => {
+              fallbackCopy(text, textEl, showCopied);
+            });
+        } else {
+          fallbackCopy(text, textEl, showCopied);
+        }
+      }
+
+      function fallbackCopy(text, sourceEl, onSuccess) {
+        try {
+          const range = document.createRange();
+          range.selectNodeContents(sourceEl);
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
+          const ok = document.execCommand("copy");
+          selection.removeAllRanges();
+          if (ok) {
+            onSuccess();
+            return;
+          }
+        } catch (e) {
+          // fall through to manual-select prompt below
+        }
+        // Last resort: select the text so the user can Ctrl+C manually.
+        alert(
+          "Couldn't copy automatically — the password is selected, press Ctrl+C (or Cmd+C) to copy it.",
+        );
+        const range = document.createRange();
+        range.selectNodeContents(sourceEl);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
       }
 
       function renderFlagList(flags, elementId) {
@@ -1058,6 +1227,7 @@
           flags: allFlags.length,
           time: new Date().toLocaleTimeString(),
           annotated: fr.annotated_pdf || null,
+          pdfPassword: fr.pdf_password || null,
         };
         recentScans.unshift(entry);
         if (recentScans.length > 10) recentScans.pop();
@@ -1089,7 +1259,11 @@
 
       function loadScan(i) {
         const s = recentScans[i];
-        if (s.annotated) loadPdfViewer(`/download/${s.annotated}`);
+        if (s.annotated) {
+          loadPdfViewer(`/download/${s.annotated}`, s.pdfPassword);
+          renderPdfPasswordBanner(s.pdfPassword, s.annotated);
+          document.getElementById("result-area").style.display = "block";
+        }
       }
 
       function openAnnotated() {
@@ -1101,6 +1275,7 @@
         if (!uploadedFilename) return;
         fetch("/report", {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             cyber: cyberResult,
@@ -1122,12 +1297,14 @@
         pdfCurrentPage = 1,
         pdfScale = 1.5,
         pdfUrl = null,
-        pdfRendering = false;
+        pdfRendering = false,
+        pdfOpenPassword = null;
 
-      function loadPdfViewer(url) {
+      function loadPdfViewer(url, password) {
         pdfUrl = url;
         pdfCurrentPage = 1;
         pdfScale = 1.5;
+        pdfOpenPassword = password || null;
         document.getElementById("pdf-placeholder").style.display = "none";
         document.getElementById("pdf-scroll").style.display = "block";
         document.getElementById("pdf-toolbar").style.display = "flex";
@@ -1149,8 +1326,10 @@
       }
 
       function _doPdfLoad(url) {
+        const loadOptions = { url };
+        if (pdfOpenPassword) loadOptions.password = pdfOpenPassword;
         pdfjsLib
-          .getDocument(url)
+          .getDocument(loadOptions)
           .promise.then((doc) => {
             pdfDoc = doc;
             updatePageInfo();
