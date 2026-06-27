@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DocShield — Document Fraud Detection</title>
+    <style>
+      :root {
+        --bg: #0d1117;
+        --surface: #161b22;
+        --surface2: #21262d;
+        --border: #30363d;
+        --text: #e6edf3;
+        --muted: #8b949e;
+        --accent: #58a6ff;
+        --critical: #f85149;
+        --high: #ff9500;
+        --medium: #f0c000;
+        --low: #3fb950;
+        --radius: 8px;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* ── Header ── */
+      header {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        height: 56px;
+        position: relative;
+        z-index: 10;
+      }
+      header h1 {
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+      }
+      header span.tagline {
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .badge {
+        background: #1f6feb33;
+        color: var(--accent);
+        border: 1px solid #1f6feb66;
+        border-radius: 12px;
+        padding: 2px 10px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+      header nav {
+        display: flex;
+        gap: 8px;
+      }
+      .nav-btn {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-radius: 6px;
+        padding: 6px 14px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .nav-btn:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .nav-btn.primary {
+        background: var(--accent);
+        color: #0d1117;
+        border-color: var(--accent);
+      }
+      .nav-btn.primary:hover {
+        opacity: 0.85;
+        color: #0d1117;
+      }
+
+      /* ── Hero ── */
+      .hero {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - 56px);
+        padding: 48px 24px;
+        overflow: hidden;
+      }
+
+      /* Signature element: radar sweep behind the shield */
+      .radar-field {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 900px;
+        height: 900px;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        opacity: 0.5;
+      }
+      .radar-ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        border: 1px solid var(--border);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .radar-sweep {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 450px;
+        height: 450px;
+        transform-origin: 0 0;
+        background: conic-gradient(
+          from 0deg,
+          #58a6ff55 0deg,
+          #58a6ff22 12deg,
+          transparent 40deg,
+          transparent 360deg
+        );
+        animation: sweep 5s linear infinite;
+        border-radius: 0 50% 0 0;
+      }
+      @keyframes sweep {
+        from {
+          transform: translate(-50%, -50%) rotate(0deg);
+        }
+        to {
+          transform: translate(-50%, -50%) rotate(360deg);
+        }
+      }
+      .radar-blip {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--critical);
+        box-shadow: 0 0 8px 2px #f8514988;
+        animation: blip-fade 5s linear infinite;
+      }
+      @keyframes blip-fade {
+        0%,
+        4% {
+          opacity: 0;
+        }
+        6% {
+          opacity: 1;
+        }
+        20% {
+          opacity: 0.15;
+        }
+        100% {
+          opacity: 0.15;
+        }
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 920px;
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 56px;
+        align-items: center;
+      }
+
+      .hero-left .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--accent);
+        margin-bottom: 18px;
+      }
+      .eyebrow .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--low);
+        box-shadow: 0 0 6px 1px #3fb95099;
+        animation: pulse 1.6s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.35;
+        }
+      }
+
+      .hero-left h2 {
+        font-size: 42px;
+        line-height: 1.12;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        margin-bottom: 18px;
+      }
+      .hero-left h2 .hl {
+        color: var(--accent);
+      }
+      .hero-left p.lead {
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.6;
+        max-width: 460px;
+        margin-bottom: 28px;
+      }
+
+      .stat-row {
+        display: flex;
+        gap: 28px;
+        margin-bottom: 32px;
+      }
+      .stat-row .stat .num {
+        font-size: 22px;
+        font-weight: 800;
+      }
+      .stat-row .stat .num.c-critical {
+        color: var(--critical);
+      }
+      .stat-row .stat .num.c-accent {
+        color: var(--accent);
+      }
+      .stat-row .stat .num.c-low {
+        color: var(--low);
+      }
+      .stat-row .stat .lbl {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 2px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .check-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .check-list .item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        color: var(--text);
+      }
+      .check-list .item svg {
+        flex-shrink: 0;
+      }
+
+      /* ── Auth card ── */
+      .auth-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 28px;
+        box-shadow: 0 12px 40px #00000066;
+      }
+      .auth-tabs {
+        display: flex;
+        background: var(--surface2);
+        border-radius: 8px;
+        padding: 3px;
+        margin-bottom: 22px;
+      }
+      .auth-tab {
+        flex: 1;
+        text-align: center;
+        padding: 8px 0;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--muted);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.15s;
+        border: none;
+        background: transparent;
+      }
+      .auth-tab.active {
+        background: var(--accent);
+        color: #0d1117;
+      }
+
+      .field {
+        margin-bottom: 14px;
+      }
+      .field label {
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+      .field input {
+        width: 100%;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-size: 13px;
+        outline: none;
+        transition: border-color 0.15s;
+      }
+      .field input:focus {
+        border-color: var(--accent);
+      }
+      .field-error {
+        font-size: 11px;
+        color: var(--critical);
+        margin-top: 5px;
+        min-height: 14px;
+      }
+
+      .auth-submit {
+        width: 100%;
+        background: var(--accent);
+        color: #0d1117;
+        border: none;
+        border-radius: 8px;
+        padding: 11px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 6px;
+        transition: opacity 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      .auth-submit:hover {
+        opacity: 0.88;
+      }
+      .auth-submit:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+      .auth-submit .spinner {
+        width: 14px;
+        height: 14px;
+        border: 2px solid #0d111766;
+        border-top-color: #0d1117;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        display: none;
+      }
+      .auth-submit.loading .spinner {
+        display: inline-block;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .auth-banner {
+        margin-top: 14px;
+        padding: 10px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        display: none;
+      }
+      .auth-banner.show {
+        display: block;
+      }
+      .auth-banner.error {
+        background: #f8514920;
+        color: var(--critical);
+        border: 1px solid #f8514955;
+      }
+      .auth-banner.success {
+        background: #3fb95020;
+        color: var(--low);
+        border: 1px solid #3fb95055;
+      }
+
+      .auth-foot {
+        text-align: center;
+        margin-top: 16px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .auth-foot a {
+        color: var(--accent);
+        cursor: pointer;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      /* ── Footer strip ── */
+      .foot-strip {
+        border-top: 1px solid var(--border);
+        background: var(--surface);
+        padding: 14px 24px;
+        text-align: center;
+        font-size: 11px;
+        color: var(--muted);
+        position: relative;
+        z-index: 5;
+      }
+
+      @media (max-width: 860px) {
+        .hero-content {
+          grid-template-columns: 1fr;
+        }
+        .hero-left h2 {
+          font-size: 32px;
+        }
+        .radar-field {
+          width: 600px;
+          height: 600px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .radar-sweep,
+        .radar-blip,
+        .eyebrow .dot {
+          animation: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M12 2L4 6V12C4 16.4 7.4 20.5 12 22C16.6 20.5 20 16.4 20 12V6L12 2Z"
+          fill="#58a6ff"
+          opacity=".9"
+        />
+        <path
+          d="M9 12L11 14L15 10"
+          stroke="white"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      <h1>DocShield</h1>
+      <span class="tagline">Document Fraud Detection System</span>
+      <div style="flex: 1"></div>
+      <span class="badge">v2.0</span>
+      <nav>
+        <button class="nav-btn" onclick="showTab('login')">Log in</button>
+        <button class="nav-btn primary" onclick="showTab('signup')">
+          Sign up
+        </button>
+      </nav>
+    </header>
+
+    <div class="hero">
+      <div class="radar-field" aria-hidden="true">
+        <div class="radar-ring" style="width: 900px; height: 900px"></div>
+        <div class="radar-ring" style="width: 650px; height: 650px"></div>
+        <div class="radar-ring" style="width: 400px; height: 400px"></div>
+        <div class="radar-ring" style="width: 150px; height: 150px"></div>
+        <div class="radar-sweep"></div>
+        <div
+          class="radar-blip"
+          style="top: 38%; left: 64%; animation-delay: 0s"
+        ></div>
+        <div
+          class="radar-blip"
+          style="top: 60%; left: 32%; animation-delay: 1.6s"
+        ></div>
+        <div
+          class="radar-blip"
+          style="top: 70%; left: 58%; animation-delay: 3.1s"
+        ></div>
+      </div>
+
+      <div class="hero-content">
+        <div class="hero-left">
+          <div class="eyebrow">
+            <span class="dot"></span> SCANNING ENGINE ONLINE
+          </div>
+          <h2>
+            Catch forged documents<br />before they
+            <span class="hl">catch you off guard.</span>
+          </h2>
+          <p class="lead">
+            Upload any PDF and DocShield runs it through metadata forensics,
+            content cross-checks, and fraud-pattern detection — flagging
+            tampered payslips, mismatched PAN/IFSC numbers, and forged
+            certificates in seconds.
+          </p>
+
+          <div class="stat-row">
+            <div class="stat">
+              <div class="num c-critical">10+</div>
+              <div class="lbl">Fraud Patterns</div>
+            </div>
+            <div class="stat">
+              <div class="num c-accent">2</div>
+              <div class="lbl">Detection Passes</div>
+            </div>
+            <div class="stat">
+              <div class="num c-low">&lt;30s</div>
+              <div class="lbl">Avg. Scan Time</div>
+            </div>
+          </div>
+
+          <div class="check-list">
+            <div class="item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="#3fb950"
+                  stroke-width="1.5"
+                />
+                <path
+                  d="M8 12l3 3 5-6"
+                  stroke="#3fb950"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              Metadata &amp; embedded-script checks
+            </div>
+            <div class="item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="#3fb950"
+                  stroke-width="1.5"
+                />
+                <path
+                  d="M8 12l3 3 5-6"
+                  stroke="#3fb950"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              Salary, TDS &amp; PAN/IFSC cross-validation
+            </div>
+            <div class="item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="#3fb950"
+                  stroke-width="1.5"
+                />
+                <path
+                  d="M8 12l3 3 5-6"
+                  stroke="#3fb950"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              Annotated report with confidence scores
+            </div>
+          </div>
+        </div>
+
+        <!-- Auth card -->
+        <div class="auth-card">
+          <div class="auth-tabs">
+            <button
+              class="auth-tab active"
+              id="tab-login"
+              onclick="showTab('login')"
+            >
+              Log in
+            </button>
+            <button
+              class="auth-tab"
+              id="tab-signup"
+              onclick="showTab('signup')"
+            >
+              Sign up
+            </button>
+          </div>
+
+          <!-- LOGIN FORM -->
+          <form id="form-login" onsubmit="return handleSubmit(event, 'login');">
+            <div class="field">
+              <label for="login-email">Email</label>
+              <input
+                type="email"
+                id="login-email"
+                required
+                autocomplete="email"
+                placeholder="you@company.com"
+              />
+            </div>
+            <div class="field">
+              <label for="login-password">Password</label>
+              <input
+                type="password"
+                id="login-password"
+                required
+                autocomplete="current-password"
+                placeholder="••••••••"
+              />
+            </div>
+            <button type="submit" class="auth-submit" id="login-submit">
+              <span class="spinner"></span>
+              <span class="btn-label">Log in &amp; start scanning</span>
+            </button>
+            <div class="auth-banner" id="login-banner"></div>
+          </form>
+
+          <!-- SIGNUP FORM -->
+          <form
+            id="form-signup"
+            style="display: none"
+            onsubmit="return handleSubmit(event, 'signup');"
+          >
+            <div class="field">
+              <label for="signup-email">Email</label>
+              <input
+                type="email"
+                id="signup-email"
+                required
+                autocomplete="email"
+                placeholder="you@company.com"
+              />
+            </div>
+            <div class="field">
+              <label for="signup-password">Password</label>
+              <input
+                type="password"
+                id="signup-password"
+                required
+                autocomplete="new-password"
+                placeholder="At least 6 characters"
+                minlength="6"
+              />
+            </div>
+            <div class="field">
+              <label for="signup-password2">Confirm password</label>
+              <input
+                type="password"
+                id="signup-password2"
+                required
+                autocomplete="new-password"
+                placeholder="••••••••"
+              />
+              <div class="field-error" id="signup-mismatch"></div>
+            </div>
+            <button type="submit" class="auth-submit" id="signup-submit">
+              <span class="spinner"></span>
+              <span class="btn-label">Create account &amp; start scanning</span>
+            </button>
+            <div class="auth-banner" id="signup-banner"></div>
+          </form>
+
+          <div class="auth-foot" id="auth-foot-login">
+            New here? <a onclick="showTab('signup')">Create an account</a>
+          </div>
+          <div class="auth-foot" id="auth-foot-signup" style="display: none">
+            Already have an account? <a onclick="showTab('login')">Log in</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot-strip">
+      DocShield v2.0 · Credentials are stored locally for this demo — do not
+      reuse a real password.
+    </div>
+
+    <script>
+      function showTab(which) {
+        const isLogin = which === "login";
+        document
+          .getElementById("tab-login")
+          .classList.toggle("active", isLogin);
+        document
+          .getElementById("tab-signup")
+          .classList.toggle("active", !isLogin);
+        document.getElementById("form-login").style.display = isLogin
+          ? "block"
+          : "none";
+        document.getElementById("form-signup").style.display = isLogin
+          ? "none"
+          : "block";
+        document.getElementById("auth-foot-login").style.display = isLogin
+          ? "block"
+          : "none";
+        document.getElementById("auth-foot-signup").style.display = isLogin
+          ? "none"
+          : "block";
+      }
+
+      function setBanner(id, message, type) {
+        const el = document.getElementById(id);
+        el.textContent = message;
+        el.className = "auth-banner show " + type;
+      }
+      function clearBanner(id) {
+        const el = document.getElementById(id);
+        el.className = "auth-banner";
+        el.textContent = "";
+      }
+
+      async function handleSubmit(evt, mode) {
+        evt.preventDefault();
+        const isLogin = mode === "login";
+        const emailEl = document.getElementById(
+          isLogin ? "login-email" : "signup-email",
+        );
+        const passEl = document.getElementById(
+          isLogin ? "login-password" : "signup-password",
+        );
+        const bannerId = isLogin ? "login-banner" : "signup-banner";
+        const submitBtn = document.getElementById(
+          isLogin ? "login-submit" : "signup-submit",
+        );
+
+        clearBanner(bannerId);
+
+        if (!isLogin) {
+          const pass2El = document.getElementById("signup-password2");
+          const mismatchEl = document.getElementById("signup-mismatch");
+          if (passEl.value !== pass2El.value) {
+            mismatchEl.textContent = "Passwords do not match.";
+            return false;
+          }
+          mismatchEl.textContent = "";
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.classList.add("loading");
+
+        try {
+          const res = await fetch(isLogin ? "/login" : "/signup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: emailEl.value.trim(),
+              password: passEl.value,
+            }),
+          });
+          const data = await res.json();
+
+          if (!res.ok || data.error) {
+            setBanner(
+              bannerId,
+              data.error || "Something went wrong. Please try again.",
+              "error",
+            );
+            submitBtn.disabled = false;
+            submitBtn.classList.remove("loading");
+            return false;
+          }
+
+          setBanner(
+            bannerId,
+            isLogin
+              ? "Welcome back — redirecting…"
+              : "Account created — redirecting…",
+            "success",
+          );
+          sessionStorage.setItem("docshield_user", data.email);
+
+          // Redirect to the main app
+          setTimeout(() => {
+            window.location.href = "index.html";
+          }, 600);
+        } catch (err) {
+          setBanner(
+            bannerId,
+            "Could not reach the server. Please try again.",
+            "error",
+          );
+          submitBtn.disabled = false;
+          submitBtn.classList.remove("loading");
+        }
+        return false;
+      }
+    </script>
+  </body>
+</html>

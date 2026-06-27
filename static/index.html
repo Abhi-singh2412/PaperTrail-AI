@@ -77,7 +77,7 @@
         border-left: 1px solid var(--border);
       }
 
-      /* ── Upload panel ── */
+      /* ── Panel headers ── */
       .panel-header {
         padding: 16px;
         border-bottom: 1px solid var(--border);
@@ -87,7 +87,16 @@
         letter-spacing: 0.8px;
         color: var(--muted);
       }
+      .panel-header.cyber {
+        color: #58a6ff;
+        border-left: 3px solid #58a6ff;
+      }
+      .panel-header.nlp {
+        color: #3fb950;
+        border-left: 3px solid #3fb950;
+      }
 
+      /* ── Drop zone ── */
       .drop-zone {
         margin: 16px;
         border: 2px dashed var(--border);
@@ -135,6 +144,7 @@
         margin-top: 4px;
       }
 
+      /* ── Buttons ── */
       .btn {
         display: block;
         width: calc(100% - 32px);
@@ -254,9 +264,56 @@
         color: var(--low);
       }
 
-      /* ── Flag list ── */
-      .flag-list {
+      /* ── Download row ── */
+      .dl-row {
+        display: flex;
+        gap: 8px;
         margin: 0 16px 16px;
+      }
+      .dl-row .btn {
+        margin: 0;
+        flex: 1;
+      }
+
+      /* ── Center panel layout ── */
+      .center-panel {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* ── PDF viewer ── */
+      .pdf-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+
+      /* ── Flags below PDF ── */
+      .flags-below {
+        display: none;
+        border-top: 1px solid var(--border);
+        background: var(--bg);
+        height: 260px;
+        flex-shrink: 0;
+      }
+      .flags-below-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        height: 100%;
+        overflow: hidden;
+      }
+      .flags-below-col {
+        overflow-y: auto;
+        border-right: 1px solid var(--border);
+      }
+      .flags-below-col:last-child {
+        border-right: none;
+      }
+      .flag-list {
+        margin: 0 12px 12px;
       }
       .flag {
         background: var(--surface2);
@@ -307,10 +364,7 @@
         margin-top: 4px;
       }
 
-      /* ── PDF viewer ── */
-      /* pdf viewer handled inline */
-
-      /* ── Right panel: recent scans + timeline ── */
+      /* ── Right panel ── */
       .recent-scans {
         padding: 0;
       }
@@ -360,16 +414,9 @@
         color: var(--low);
       }
 
-      /* ── Confidence timeline ── */
+      /* ── Timeline ── */
       .timeline {
         padding: 16px;
-      }
-      .tl-title {
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.6px;
-        color: var(--muted);
-        margin-bottom: 12px;
       }
       .tl-bar-wrap {
         margin-bottom: 10px;
@@ -393,23 +440,12 @@
         transition: width 0.6s ease;
       }
 
-      /* ── Empty state ── */
+      /* ── Empty ── */
       .empty {
         text-align: center;
-        padding: 40px 16px;
+        padding: 20px 16px;
         color: var(--muted);
         font-size: 12px;
-      }
-
-      /* ── Download row ── */
-      .dl-row {
-        display: flex;
-        gap: 8px;
-        margin: 0 16px 16px;
-      }
-      .dl-row .btn {
-        margin: 0;
-        flex: 1;
       }
     </style>
   </head>
@@ -499,162 +535,179 @@
         <div id="result-area" style="display: none">
           <div class="scores" id="score-cards"></div>
           <div class="dl-row" id="dl-row"></div>
-          <div class="panel-header" style="margin-top: 8px">Flags Detected</div>
-          <div class="flag-list" id="flag-list"></div>
         </div>
       </div>
 
-      <!-- ── CENTER: PDF Viewer ── -->
-      <div
-        style="
-          position: relative;
-          overflow: hidden;
-          display: flex;
-          flex-direction: column;
-        "
-      >
-        <!-- toolbar -->
-        <div
-          id="pdf-toolbar"
-          style="
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 8px 16px;
-            display: none;
-            align-items: center;
-            gap: 12px;
-            flex-shrink: 0;
-          "
-        >
-          <button
-            onclick="pdfPrevPage()"
-            style="
-              background: var(--surface2);
-              border: 1px solid var(--border);
-              color: var(--text);
-              border-radius: 6px;
-              padding: 4px 10px;
-              cursor: pointer;
-              font-size: 12px;
-            "
-          >
-            ‹ Prev
-          </button>
-          <span id="pdf-page-info" style="font-size: 12px; color: var(--muted)"
-            >Page 1 / 1</span
-          >
-          <button
-            onclick="pdfNextPage()"
-            style="
-              background: var(--surface2);
-              border: 1px solid var(--border);
-              color: var(--text);
-              border-radius: 6px;
-              padding: 4px 10px;
-              cursor: pointer;
-              font-size: 12px;
-            "
-          >
-            Next ›
-          </button>
-          <button
-            onclick="pdfZoomOut()"
-            style="
-              background: var(--surface2);
-              border: 1px solid var(--border);
-              color: var(--text);
-              border-radius: 6px;
-              padding: 4px 10px;
-              cursor: pointer;
-              font-size: 12px;
-            "
-          >
-            −
-          </button>
-          <button
-            onclick="pdfZoomIn()"
-            style="
-              background: var(--surface2);
-              border: 1px solid var(--border);
-              color: var(--text);
-              border-radius: 6px;
-              padding: 4px 10px;
-              cursor: pointer;
-              font-size: 12px;
-            "
-          >
-            +
-          </button>
-          <span id="pdf-zoom-info" style="font-size: 12px; color: var(--muted)"
-            >100%</span
-          >
-          <div style="flex: 1"></div>
-          <button
-            onclick="openAnnotated()"
-            style="
-              background: var(--accent);
-              border: none;
-              color: #0d1117;
-              border-radius: 6px;
-              padding: 4px 12px;
-              cursor: pointer;
-              font-size: 12px;
-              font-weight: 600;
-            "
-          >
-            ⬇ Download
-          </button>
-        </div>
-        <!-- canvas scroll area -->
-        <div
-          id="pdf-scroll"
-          style="
-            flex: 1;
-            overflow-y: auto;
-            background: #525659;
-            display: none;
-            padding: 16px;
-            text-align: center;
-          "
-        >
-          <canvas
-            id="pdf-canvas"
-            style="max-width: 100%; box-shadow: 0 4px 24px #0008"
-          ></canvas>
+      <!-- ── CENTER: PDF Viewer + Flags Below ── -->
+      <div class="center-panel">
+        <!-- PDF area -->
+        <div class="pdf-area">
+          <!-- toolbar -->
           <div
-            id="pdf-loading"
+            id="pdf-toolbar"
             style="
-              color: #ccc;
-              font-size: 13px;
-              margin-top: 20px;
+              background: var(--surface);
+              border-bottom: 1px solid var(--border);
+              padding: 8px 16px;
               display: none;
+              align-items: center;
+              gap: 12px;
+              flex-shrink: 0;
             "
           >
-            Rendering…
+            <button
+              onclick="pdfPrevPage()"
+              style="
+                background: var(--surface2);
+                border: 1px solid var(--border);
+                color: var(--text);
+                border-radius: 6px;
+                padding: 4px 10px;
+                cursor: pointer;
+                font-size: 12px;
+              "
+            >
+              ‹ Prev
+            </button>
+            <span
+              id="pdf-page-info"
+              style="font-size: 12px; color: var(--muted)"
+              >Page 1 / 1</span
+            >
+            <button
+              onclick="pdfNextPage()"
+              style="
+                background: var(--surface2);
+                border: 1px solid var(--border);
+                color: var(--text);
+                border-radius: 6px;
+                padding: 4px 10px;
+                cursor: pointer;
+                font-size: 12px;
+              "
+            >
+              Next ›
+            </button>
+            <button
+              onclick="pdfZoomOut()"
+              style="
+                background: var(--surface2);
+                border: 1px solid var(--border);
+                color: var(--text);
+                border-radius: 6px;
+                padding: 4px 10px;
+                cursor: pointer;
+                font-size: 12px;
+              "
+            >
+              −
+            </button>
+            <button
+              onclick="pdfZoomIn()"
+              style="
+                background: var(--surface2);
+                border: 1px solid var(--border);
+                color: var(--text);
+                border-radius: 6px;
+                padding: 4px 10px;
+                cursor: pointer;
+                font-size: 12px;
+              "
+            >
+              +
+            </button>
+            <span
+              id="pdf-zoom-info"
+              style="font-size: 12px; color: var(--muted)"
+              >150%</span
+            >
+            <div style="flex: 1"></div>
+            <button
+              onclick="openAnnotated()"
+              style="
+                background: var(--accent);
+                border: none;
+                color: #0d1117;
+                border-radius: 6px;
+                padding: 4px 12px;
+                cursor: pointer;
+                font-size: 12px;
+                font-weight: 600;
+              "
+            >
+              ⬇ Download
+            </button>
+          </div>
+
+          <!-- canvas -->
+          <div
+            id="pdf-scroll"
+            style="
+              flex: 1;
+              overflow-y: auto;
+              background: #525659;
+              display: none;
+              padding: 16px;
+              text-align: center;
+            "
+          >
+            <canvas
+              id="pdf-canvas"
+              style="max-width: 100%; box-shadow: 0 4px 24px #0008"
+            ></canvas>
+            <div
+              id="pdf-loading"
+              style="
+                color: #ccc;
+                font-size: 13px;
+                margin-top: 20px;
+                display: none;
+              "
+            >
+              Rendering…
+            </div>
+          </div>
+
+          <!-- placeholder -->
+          <div
+            id="pdf-placeholder"
+            style="
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              color: var(--muted);
+              gap: 12px;
+            "
+          >
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"
+                stroke="#8b949e"
+                stroke-width="1.2"
+              />
+              <path d="M14 2v6h6" stroke="#8b949e" stroke-width="1.2" />
+            </svg>
+            <p>Annotated PDF will appear here after analysis</p>
           </div>
         </div>
-        <!-- placeholder -->
-        <div
-          id="pdf-placeholder"
-          style="
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: var(--muted);
-            gap: 12px;
-          "
-        >
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"
-              stroke="#8b949e"
-              stroke-width="1.2"
-            />
-            <path d="M14 2v6h6" stroke="#8b949e" stroke-width="1.2" />
-          </svg>
-          <p>Annotated PDF will appear here after analysis</p>
+
+        <!-- Flags below PDF -->
+        <div class="flags-below" id="flags-below">
+          <div class="flags-below-grid">
+            <!-- Cyber flags -->
+            <div class="flags-below-col">
+              <div class="panel-header cyber">Cyber Layer Flags</div>
+              <div class="flag-list" id="flag-list-cyber"></div>
+            </div>
+
+            <!-- NLP flags -->
+            <div class="flags-below-col">
+              <div class="panel-header nlp">NLP / Content Flags</div>
+              <div class="flag-list" id="flag-list-nlp"></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -665,17 +718,23 @@
           <div class="empty">No scans yet</div>
         </div>
 
-        <div class="panel-header" style="margin-top: 8px">
-          Detection Breakdown
+        <div class="panel-header cyber" style="margin-top: 8px">
+          Cyber Detection
         </div>
-        <div class="timeline" id="timeline">
+        <div class="timeline" id="timeline-cyber">
+          <div class="empty">Run an analysis to see breakdown</div>
+        </div>
+
+        <div class="panel-header nlp" style="margin-top: 8px">
+          NLP Detection
+        </div>
+        <div class="timeline" id="timeline-nlp">
           <div class="empty">Run an analysis to see breakdown</div>
         </div>
       </div>
     </div>
 
     <script>
-      // ── State ──────────────────────────────────────────────────────
       let uploadedFilename = null;
       let cyberResult = null;
       let fraudResult = null;
@@ -683,7 +742,7 @@
         sessionStorage.getItem("docshield_scans") || "[]",
       );
 
-      // ── Drag & Drop ────────────────────────────────────────────────
+      // ── Drag & Drop ──
       const dz = document.getElementById("drop-zone");
       dz.addEventListener("dragover", (e) => {
         e.preventDefault();
@@ -709,12 +768,10 @@
         uploadedFilename = null;
         cyberResult = null;
         fraudResult = null;
-
         const fi = document.getElementById("file-info");
         fi.style.display = "block";
         document.getElementById("fname").textContent = f.name;
-        document.getElementById("fmeta").textContent = `Uploading…`;
-
+        document.getElementById("fmeta").textContent = "Uploading…";
         const fd = new FormData();
         fd.append("file", f);
         fetch("/upload", { method: "POST", body: fd })
@@ -732,19 +789,18 @@
           .catch((e) => alert("Upload failed: " + e));
       }
 
-      // ── Analysis ──────────────────────────────────────────────────
+      // ── Analysis ──
       async function runAnalysis() {
         if (!uploadedFilename) return;
-
         document.getElementById("btn-analyze").disabled = true;
         document.getElementById("steps").style.display = "block";
         document.getElementById("result-area").style.display = "none";
+        document.getElementById("flags-below").style.display = "none";
         cyberResult = null;
         fraudResult = null;
 
         setStep("s-upload", "done");
         setStep("s-cyber", "active");
-
         try {
           cyberResult = await post("/analyze/cyber", {
             filename: uploadedFilename,
@@ -765,7 +821,6 @@
         }
 
         setStep("s-done", "done");
-
         renderResults();
         addToRecentScans();
         document.getElementById("btn-analyze").disabled = false;
@@ -780,92 +835,97 @@
       }
 
       function setStep(id, state) {
-        const el = document.getElementById(id);
-        el.className = "step " + state;
+        document.getElementById(id).className = "step " + state;
       }
 
-      // ── Render ─────────────────────────────────────────────────────
+      // ── Render ──
       function renderResults() {
-        const area = document.getElementById("result-area");
-        area.style.display = "block";
-
         const cr = cyberResult || {};
         const fr = fraudResult || {};
-        const allFlags = [...(cr.flags || []), ...(fr.flags || [])];
+        const cyberFlags = cr.flags || [];
+        const nlpFlags = fr.flags || [];
+        const allFlags = [...cyberFlags, ...nlpFlags];
 
-        // Score cards
+        document.getElementById("result-area").style.display = "block";
+
         const rl = fr.risk_level || cr.risk_level || "UNKNOWN";
         const cred =
           fr.credibility_score != null ? fr.credibility_score.toFixed(1) : "—";
+
         document.getElementById("score-cards").innerHTML = `
-    <div class="score-card">
-      <div class="label">Risk Level</div>
-      <div class="value risk-${rl}">${rl}</div>
-      <div class="sub">${allFlags.length} flag(s) found</div>
-    </div>
-    <div class="score-card">
-      <div class="label">Credibility</div>
-      <div class="value">${cred}%</div>
-      <div class="sub">Doc: ${(fr.document_type || "unknown").replace("_", " ")}</div>
-    </div>
-    <div class="score-card">
-      <div class="label">Cyber Score</div>
-      <div class="value risk-${cr.risk_level || "LOW"}">${((cr.cyber_score || 0) * 100).toFixed(0)}%</div>
-      <div class="sub">${cr.risk_level || "—"}</div>
-    </div>
-    <div class="score-card">
-      <div class="label">Flags</div>
-      <div class="value">${allFlags.length}</div>
-      <div class="sub">
-        <span style="color:var(--critical)">${allFlags.filter((f) => f.severity === "CRITICAL").length} crit</span>
-        &nbsp;
-        <span style="color:var(--high)">${allFlags.filter((f) => f.severity === "HIGH").length} high</span>
-      </div>
-    </div>
-  `;
-        // Download row
+          <div class="score-card">
+            <div class="label">Risk Level</div>
+            <div class="value risk-${rl}">${rl}</div>
+            <div class="sub">${allFlags.length} flag(s) found</div>
+          </div>
+          <div class="score-card">
+            <div class="label">Credibility</div>
+            <div class="value">${cred}%</div>
+            <div class="sub">Doc: ${(fr.document_type || "unknown").replace("_", " ")}</div>
+          </div>
+          <div class="score-card">
+            <div class="label">Cyber Score</div>
+            <div class="value risk-${cr.risk_level || "LOW"}">${((cr.cyber_score || 0) * 100).toFixed(0)}%</div>
+            <div class="sub">${cr.risk_level || "—"}</div>
+          </div>
+          <div class="score-card">
+            <div class="label">Flags</div>
+            <div class="value">${allFlags.length}</div>
+            <div class="sub">
+              <span style="color:var(--critical)">${allFlags.filter((f) => f.severity === "CRITICAL").length} crit</span>
+              &nbsp;
+              <span style="color:var(--high)">${allFlags.filter((f) => f.severity === "HIGH").length} high</span>
+            </div>
+          </div>
+        `;
+
         let dlHtml = `<button class="btn btn-secondary" onclick="downloadReport()">⬇ JSON Report</button>`;
         if (fr.annotated_pdf) {
           dlHtml += `<button class="btn btn-primary" onclick="openAnnotated()">📄 Annotated PDF</button>`;
         }
         document.getElementById("dl-row").innerHTML = dlHtml;
-        // Annotated PDF viewer
+
         if (fr.annotated_pdf) {
           loadPdfViewer(`/download/${fr.annotated_pdf}`);
+          document.getElementById("flags-below").style.display = "block";
         }
-        // Flag list
+
+        renderFlagList(cyberFlags, "flag-list-cyber");
+        renderFlagList(nlpFlags, "flag-list-nlp");
+        renderTimelineCyber(cyberFlags);
+        renderTimelineNlp(nlpFlags);
+      }
+
+      function renderFlagList(flags, elementId) {
         const order = ["CRITICAL", "HIGH", "MEDIUM", "LOW"];
-        const sorted = [...allFlags].sort(
+        const sorted = [...flags].sort(
           (a, b) => order.indexOf(a.severity) - order.indexOf(b.severity),
         );
         if (sorted.length === 0) {
-          document.getElementById("flag-list").innerHTML =
-            '<div class="empty" style="color:var(--low)">✓ No flags detected</div>';
+          document.getElementById(elementId).innerHTML =
+            '<div class="empty" style="color:var(--low)">No flags detected</div>';
         } else {
-          document.getElementById("flag-list").innerHTML = sorted
+          document.getElementById(elementId).innerHTML = sorted
             .map(
               (f) => `
-      <div class="flag ${f.severity}">
-        <div class="flag-type">${f.severity} · ${(f.type || "").replace(/_/g, " ")}</div>
-        <div class="flag-desc">${f.description || ""}</div>
-        <div class="flag-conf">Confidence: ${((f.confidence || 0) * 100).toFixed(0)}%</div>
-      </div>
-    `,
+            <div class="flag ${f.severity}">
+              <div class="flag-type">${f.severity} · ${(f.type || "").replace(/_/g, " ")}</div>
+              <div class="flag-desc">${f.description || ""}</div>
+              <div class="flag-conf">Confidence: ${((f.confidence || 0) * 100).toFixed(0)}%</div>
+            </div>
+          `,
             )
             .join("");
         }
-
-        // Timeline breakdown
-        renderTimeline(allFlags);
       }
 
-      function renderTimeline(flags) {
-        const tl = document.getElementById("timeline");
+      function renderTimelineCyber(flags) {
+        const tl = document.getElementById("timeline-cyber");
         if (!flags.length) {
-          tl.innerHTML = '<div class="empty">No flags</div>';
+          tl.innerHTML =
+            '<div class="empty" style="color:var(--low)">All cyber checks clean</div>';
           return;
         }
-
         const checks = [
           {
             label: "Hash / Resubmission",
@@ -884,10 +944,32 @@
             types: [
               "pdf_encrypted",
               "embedded_javascript",
+              "embedded_attachments",
               "suspicious_page_count",
               "suspicious_file_size",
             ],
           },
+          {
+            label: "Scan Detection",
+            types: [
+              "fully_scanned_document",
+              "mixed_document",
+              "low_resolution_scan",
+              "inconsistent_resolution",
+            ],
+          },
+        ];
+        tl.innerHTML = buildTimelineHtml(flags, checks);
+      }
+
+      function renderTimelineNlp(flags) {
+        const tl = document.getElementById("timeline-nlp");
+        if (!flags.length) {
+          tl.innerHTML =
+            '<div class="empty" style="color:var(--low)">All NLP checks clean</div>';
+          return;
+        }
+        const checks = [
           {
             label: "Salary Math",
             types: [
@@ -897,7 +979,10 @@
               "ctc_mismatch",
             ],
           },
-          { label: "TDS / Tax", types: ["annual_tds_mismatch"] },
+          {
+            label: "TDS / Tax",
+            types: ["annual_tds_mismatch", "tds_mismatch"],
+          },
           {
             label: "PAN / IFSC",
             types: [
@@ -922,8 +1007,15 @@
             types: ["ocr_corruption", "negative_amount"],
           },
           { label: "Company", types: ["unverified_company", "invalid_cin"] },
+          {
+            label: "Income vs Profession",
+            types: ["income_too_high", "income_too_low"],
+          },
         ];
+        tl.innerHTML = buildTimelineHtml(flags, checks);
+      }
 
+      function buildTimelineHtml(flags, checks) {
         const sevScore = { CRITICAL: 1.0, HIGH: 0.75, MEDIUM: 0.5, LOW: 0.25 };
         const colors = {
           CRITICAL: "var(--critical)",
@@ -935,12 +1027,11 @@
         flags.forEach((f) => {
           typeMap[f.type] = f;
         });
-
         let html = "";
         checks.forEach((c) => {
           const hits = c.types.map((t) => typeMap[t]).filter(Boolean);
           const count = hits.length;
-          const maxSev = hits.sort(
+          const maxSev = [...hits].sort(
             (a, b) => sevScore[b.severity] - sevScore[a.severity],
           )[0];
           const pct = count === 0 ? 0 : Math.min(100, count * 35);
@@ -948,15 +1039,14 @@
           const label2 =
             count === 0 ? "clean" : `${count} flag${count > 1 ? "s" : ""}`;
           html += `
-      <div class="tl-bar-wrap">
-        <div class="tl-label"><span>${c.label}</span><span style="color:${color}">${label2}</span></div>
-        <div class="tl-bar-bg"><div class="tl-bar" style="width:${pct}%;background:${color}"></div></div>
-      </div>`;
+            <div class="tl-bar-wrap">
+              <div class="tl-label"><span>${c.label}</span><span style="color:${color}">${label2}</span></div>
+              <div class="tl-bar-bg"><div class="tl-bar" style="width:${pct}%;background:${color}"></div></div>
+            </div>`;
         });
-        tl.innerHTML = html;
+        return html;
       }
 
-      // ── Recent scans ───────────────────────────────────────────────
       function addToRecentScans() {
         const cr = cyberResult || {};
         const fr = fraudResult || {};
@@ -984,15 +1074,15 @@
         el.innerHTML = recentScans
           .map(
             (s, i) => `
-    <div class="scan-item" onclick="loadScan(${i})">
-      <div class="scan-name">${s.name}</div>
-      <div class="scan-meta">
-        <span class="scan-badge sb-${s.risk}">${s.risk}</span>
-        <span>${s.flags} flags</span>
-        <span>${s.time}</span>
-      </div>
-    </div>
-  `,
+          <div class="scan-item" onclick="loadScan(${i})">
+            <div class="scan-name">${s.name}</div>
+            <div class="scan-meta">
+              <span class="scan-badge sb-${s.risk}">${s.risk}</span>
+              <span>${s.flags} flags</span>
+              <span>${s.time}</span>
+            </div>
+          </div>
+        `,
           )
           .join("");
       }
@@ -1002,11 +1092,9 @@
         if (s.annotated) loadPdfViewer(`/download/${s.annotated}`);
       }
 
-      // ── Downloads ─────────────────────────────────────────────────
       function openAnnotated() {
-        if (fraudResult && fraudResult.annotated_pdf) {
+        if (fraudResult && fraudResult.annotated_pdf)
           window.open(`/download/${fraudResult.annotated_pdf}`, "_blank");
-        }
       }
 
       function downloadReport() {
@@ -1029,25 +1117,22 @@
           });
       }
 
-      // ── PDF.js Viewer ─────────────────────────────────────────────
-      let pdfDoc = null;
-      let pdfCurrentPage = 1;
-      let pdfScale = 1.5;
-      let pdfUrl = null;
-      let pdfRendering = false;
+      // ── PDF.js ──
+      let pdfDoc = null,
+        pdfCurrentPage = 1,
+        pdfScale = 1.5,
+        pdfUrl = null,
+        pdfRendering = false;
 
       function loadPdfViewer(url) {
         pdfUrl = url;
         pdfCurrentPage = 1;
         pdfScale = 1.5;
-
         document.getElementById("pdf-placeholder").style.display = "none";
         document.getElementById("pdf-scroll").style.display = "block";
         document.getElementById("pdf-toolbar").style.display = "flex";
         document.getElementById("pdf-loading").style.display = "block";
         document.getElementById("pdf-canvas").style.display = "none";
-
-        // Load PDF.js lazily
         if (window.pdfjsLib) {
           _doPdfLoad(url);
           return;
@@ -1083,20 +1168,17 @@
         pdfRendering = true;
         document.getElementById("pdf-loading").style.display = "block";
         document.getElementById("pdf-canvas").style.display = "none";
-
         pdfDoc.getPage(num).then((page) => {
           const viewport = page.getViewport({ scale: pdfScale });
           const canvas = document.getElementById("pdf-canvas");
           const ctx = canvas.getContext("2d");
           canvas.height = viewport.height;
           canvas.width = viewport.width;
-
           page.render({ canvasContext: ctx, viewport }).promise.then(() => {
             pdfRendering = false;
             document.getElementById("pdf-loading").style.display = "none";
             canvas.style.display = "block";
             updatePageInfo();
-            // scroll to top of viewer on page change
             document.getElementById("pdf-scroll").scrollTop = 0;
           });
         });
@@ -1129,7 +1211,6 @@
         renderPage(pdfCurrentPage);
       }
 
-      // ── Init ──────────────────────────────────────────────────────
       renderRecentScans();
     </script>
   </body>
