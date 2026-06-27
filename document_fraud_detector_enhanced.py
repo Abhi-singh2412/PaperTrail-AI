@@ -120,14 +120,14 @@ def extract_specific_values(text):
     positions = {}
     
     patterns = {
-        "gross_salary": r"(?:Gross\s+Salary|Gross\s+Pay)[:\s₹,]*([0-9,]+)",
-        "net_salary": r"(?:Net\s+Salary|Net\s+Pay)[:\s₹,]*([0-9,]+)",
-        "tds": r"TDS[^0-9₹]*[₹\s]*([0-9,]+)",
-        "annual_ctc": r"(?:Annual\s+CTC|Total\s+CTC)[:\s₹,]*([0-9,]+)",
-        "annual_tds": r"Annual\s+TDS[:\s₹,]*([0-9,]+)",
-        "pan": r"[A-Z]{5}[0-9]{4}[A-Z]{1}",
-        "ifsc": r"[A-Z]{4}0[A-Z0-9]{6}"
-    }
+    "gross_salary": r"(?:Gross\s+Salary|Gross\s+Pay)[:\s]*(?:Rs\.?|₹)\s*([0-9,]+)",
+    "net_salary": r"(?:Net\s+Salary|Net\s+Pay)[:\s]*(?:Rs\.?|₹)\s*([0-9,]+)",
+    "tds": r"TDS[^0-9₹Rs]*(?:Rs\.?|₹)\s*([0-9,]+)",
+    "annual_ctc": r"(?:Annual\s+CTC|Total\s+CTC)[:\s]*(?:Rs\.?|₹)\s*([0-9,]+)",
+    "annual_tds": r"Annual\s+TDS[:\s]*(?:Rs\.?|₹)\s*([0-9,]+)",
+    "pan": r"[A-Z]{5}[0-9]{4}[A-Z]{1}",
+    "ifsc": r"[A-Z]{4}0[A-Z0-9]{6}"
+}
     
     for key, pattern in patterns.items():
         matches = list(re.finditer(pattern, text, re.IGNORECASE))
