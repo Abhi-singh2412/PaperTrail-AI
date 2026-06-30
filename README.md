@@ -18,6 +18,9 @@
 
 ---
 
+## Working Video Solution
+https://drive.google.com/file/d/1Y_hWUB2LMnAj5mMReRqKqtB318mCpiDZ/view?usp=sharing
+
 ## 🚩 The Problem
 
 Every day, lenders, HR teams, and background-verification firms receive forged salary slips, fabricated Form 16s, and doctored bank statements. In India alone, document fraud costs the financial sector thousands of crores annually — and most of it goes unnoticed because verification is still done manually, if at all.
